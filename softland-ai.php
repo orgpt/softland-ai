@@ -329,9 +329,9 @@ final class Softland_AI_Plugin {
 
 		wp_enqueue_style(
 			'softland-ai-frontend',
-			$this->plugin_url( 'assets/css/frontend.css' ),
+			$this->plugin_url( 'assets/css/frontend-v2.css' ),
 			array(),
-			file_exists( $this->plugin_path( 'assets/css/frontend.css' ) ) ? filemtime( $this->plugin_path( 'assets/css/frontend.css' ) ) : '1.1.1'
+			file_exists( $this->plugin_path( 'assets/css/frontend-v2.css' ) ) ? filemtime( $this->plugin_path( 'assets/css/frontend-v2.css' ) ) : '1.1.1'
 		);
 
 		wp_enqueue_script(
