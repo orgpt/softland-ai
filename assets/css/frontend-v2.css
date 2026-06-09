@@ -187,7 +187,7 @@
 .softland-ai__messages {
 	display: grid;
 	gap: 0.55rem;
-	max-block-size: 165px;
+	max-block-size: 220px;
 	overflow: auto;
 	padding-inline-end: 0.25rem;
 }
@@ -390,7 +390,7 @@
 	}
 
 	.softland-ai__messages {
-		max-block-size: 110px;
+		max-block-size: 180px;
 	}
 
 	.softland-ai__composer textarea {
