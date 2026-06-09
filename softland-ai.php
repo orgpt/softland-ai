@@ -58,8 +58,8 @@ final class Softland_AI_Plugin {
 			'model'               => 'deepseek-chat',
 			'widget_label'        => 'سوفت لاند AI',
 			'launcher_text'       => '',
-			'store_profile'       => 'سوفت لاند متجر ووردبريس/ووكومرس متخصص في قطع الكمبيوتر، التجميعات الجاهزة، تجميع جهازك، الشاشات، الملحقات، الإكسسوارات، وورك ستيشن، وعروض التقسيط داخل السعودية. ركز على توجيه المستخدم بسرعة لأقرب منتج أو تصنيف أو صفحة مفيدة داخل المتجر.',
-			'answer_style'        => 'اجعل الرد قصيرًا وواضحًا وعمليًا. اذكر المنتج أو التصنيف أو الصفحة المناسبة أولًا، ثم أضف خطوة تالية بسيطة مثل: افتح الرابط، تصفح الفئة، أو استخدم البحث.',
+			'store_profile'       => 'سوفت لاند متجر ووردبريس/ووكومرس متخصص بقطع الكمبيوتر، التجميعات الجاهزة، صفحة جمع جهازك، الشاشات، الملحقات، الإكسسوارات، وورك ستيشن، وعروض التقسيط داخل السعودية. خلّ الرد يوجّه العميل بسرعة لأقرب منتج أو تصنيف أو صفحة تفيده داخل المتجر.',
+			'answer_style'        => 'خل الرد باللهجة السعودية ويكون قصير وواضح وعملي. اذكر المنتج أو التصنيف أو الصفحة المناسبة أول، وبعدها اقترح خطوة بسيطة مثل: افتح الرابط، شف هالفئة، أو استخدم البحث.',
 			'featured_categories' => "التجميعات\nمكونات الـPC\nالشاشات\nالملحقات\nالاكسسوارات\nورك ستيشن",
 			'important_pages'     => "shop\nالمتجر\nجمع جهازك\nعناوين الفروع\nabout-softland\nالشروط الأحكام",
 			'quick_prompts'       => "أبغى تجميعة ألعاب قوية\nأبحث عن كرت شاشة مناسب\nوين صفحة جمع جهازك؟\nكيف أعرف الشحن والضمان؟\nهل عندكم تقسيط؟",
@@ -130,36 +130,36 @@ final class Softland_AI_Plugin {
 
 		add_settings_section(
 			'softland_ai_api',
-			__( 'AI Connection', 'softland-ai' ),
+			__( 'ربط الذكاء', 'softland-ai' ),
 			function () {
-				echo '<p>' . esc_html__( 'Configure the API credentials and model used by the Softland assistant.', 'softland-ai' ) . '</p>';
+				echo '<p>' . esc_html__( 'من هنا تضبط بيانات الـ API والموديل اللي يستخدمه مساعد سوفت لاند.', 'softland-ai' ) . '</p>';
 			},
 			'softland-ai'
 		);
 
-		add_settings_field( 'enabled', __( 'Enable Widget', 'softland-ai' ), array( $this, 'field_enabled' ), 'softland-ai', 'softland_ai_api' );
-		add_settings_field( 'api_key', __( 'API Key', 'softland-ai' ), array( $this, 'field_api_key' ), 'softland-ai', 'softland_ai_api' );
-		add_settings_field( 'base_url', __( 'Base URL', 'softland-ai' ), array( $this, 'field_base_url' ), 'softland-ai', 'softland_ai_api' );
-		add_settings_field( 'model', __( 'Model', 'softland-ai' ), array( $this, 'field_model' ), 'softland-ai', 'softland_ai_api' );
-		add_settings_field( 'widget_label', __( 'Assistant Name', 'softland-ai' ), array( $this, 'field_widget_label' ), 'softland-ai', 'softland_ai_api' );
-		add_settings_field( 'launcher_text', __( 'Launcher Text', 'softland-ai' ), array( $this, 'field_launcher_text' ), 'softland-ai', 'softland_ai_api' );
+		add_settings_field( 'enabled', __( 'تفعيل الودجت', 'softland-ai' ), array( $this, 'field_enabled' ), 'softland-ai', 'softland_ai_api' );
+		add_settings_field( 'api_key', __( 'مفتاح الـ API', 'softland-ai' ), array( $this, 'field_api_key' ), 'softland-ai', 'softland_ai_api' );
+		add_settings_field( 'base_url', __( 'رابط الـ API', 'softland-ai' ), array( $this, 'field_base_url' ), 'softland-ai', 'softland_ai_api' );
+		add_settings_field( 'model', __( 'اسم الموديل', 'softland-ai' ), array( $this, 'field_model' ), 'softland-ai', 'softland_ai_api' );
+		add_settings_field( 'widget_label', __( 'اسم المساعد', 'softland-ai' ), array( $this, 'field_widget_label' ), 'softland-ai', 'softland_ai_api' );
+		add_settings_field( 'launcher_text', __( 'نص الزر', 'softland-ai' ), array( $this, 'field_launcher_text' ), 'softland-ai', 'softland_ai_api' );
 
 		add_settings_section(
 			'softland_ai_store',
-			__( 'Store Intelligence', 'softland-ai' ),
+			__( 'ذكاء المتجر', 'softland-ai' ),
 			function () {
-				echo '<p>' . esc_html__( 'Teach the assistant how Softland should answer and which parts of the store matter most.', 'softland-ai' ) . '</p>';
+				echo '<p>' . esc_html__( 'هنا تعلم المساعد كيف يرد وش أهم أقسام وصفحات سوفت لاند بالنسبة لك.', 'softland-ai' ) . '</p>';
 			},
 			'softland-ai'
 		);
 
-		add_settings_field( 'store_profile', __( 'Store Profile', 'softland-ai' ), array( $this, 'field_store_profile' ), 'softland-ai', 'softland_ai_store' );
-		add_settings_field( 'answer_style', __( 'Reply Style', 'softland-ai' ), array( $this, 'field_answer_style' ), 'softland-ai', 'softland_ai_store' );
-		add_settings_field( 'featured_categories', __( 'Featured Categories', 'softland-ai' ), array( $this, 'field_featured_categories' ), 'softland-ai', 'softland_ai_store' );
-		add_settings_field( 'important_pages', __( 'Important Pages', 'softland-ai' ), array( $this, 'field_important_pages' ), 'softland-ai', 'softland_ai_store' );
-		add_settings_field( 'quick_prompts', __( 'Quick Prompts', 'softland-ai' ), array( $this, 'field_quick_prompts' ), 'softland-ai', 'softland_ai_store' );
-		add_settings_field( 'max_products', __( 'Products In Context', 'softland-ai' ), array( $this, 'field_max_products' ), 'softland-ai', 'softland_ai_store' );
-		add_settings_field( 'max_categories', __( 'Categories In Context', 'softland-ai' ), array( $this, 'field_max_categories' ), 'softland-ai', 'softland_ai_store' );
+		add_settings_field( 'store_profile', __( 'وصف المتجر', 'softland-ai' ), array( $this, 'field_store_profile' ), 'softland-ai', 'softland_ai_store' );
+		add_settings_field( 'answer_style', __( 'أسلوب الرد', 'softland-ai' ), array( $this, 'field_answer_style' ), 'softland-ai', 'softland_ai_store' );
+		add_settings_field( 'featured_categories', __( 'الأقسام المهمة', 'softland-ai' ), array( $this, 'field_featured_categories' ), 'softland-ai', 'softland_ai_store' );
+		add_settings_field( 'important_pages', __( 'الصفحات المهمة', 'softland-ai' ), array( $this, 'field_important_pages' ), 'softland-ai', 'softland_ai_store' );
+		add_settings_field( 'quick_prompts', __( 'الأسئلة السريعة', 'softland-ai' ), array( $this, 'field_quick_prompts' ), 'softland-ai', 'softland_ai_store' );
+		add_settings_field( 'max_products', __( 'عدد المنتجات في السياق', 'softland-ai' ), array( $this, 'field_max_products' ), 'softland-ai', 'softland_ai_store' );
+		add_settings_field( 'max_categories', __( 'عدد الأقسام في السياق', 'softland-ai' ), array( $this, 'field_max_categories' ), 'softland-ai', 'softland_ai_store' );
 	}
 
 	/**
@@ -197,15 +197,15 @@ final class Softland_AI_Plugin {
 		?>
 		<div class="wrap">
 			<h1><?php esc_html_e( 'Softland AI', 'softland-ai' ); ?></h1>
-			<p><?php esc_html_e( 'AI shopping assistant for Softland WooCommerce pages, products, collections, and support links.', 'softland-ai' ); ?></p>
+			<p><?php esc_html_e( 'مساعد ذكي لمتجر سوفت لاند يساعد العميل يوصل بسرعة للمنتجات، الأقسام، وروابط الخدمة المهمة.', 'softland-ai' ); ?></p>
 			<form method="post" action="options.php">
 				<?php settings_fields( 'softland_ai_group' ); ?>
 				<?php do_settings_sections( 'softland-ai' ); ?>
 				<?php submit_button(); ?>
 			</form>
 			<hr>
-			<p><strong><?php esc_html_e( 'Saved API key status:', 'softland-ai' ); ?></strong> <?php echo ! empty( $settings['api_key'] ) ? esc_html__( 'API key saved', 'softland-ai' ) : esc_html__( 'No API key saved yet', 'softland-ai' ); ?></p>
-			<p><strong><?php esc_html_e( 'Optimization note:', 'softland-ai' ); ?></strong> <?php esc_html_e( 'Default prompts and store profile are pre-tuned for Softland computer parts, gaming PCs, accessories, installments, and branch/service pages.', 'softland-ai' ); ?></p>
+			<p><strong><?php esc_html_e( 'حالة مفتاح الـ API:', 'softland-ai' ); ?></strong> <?php echo ! empty( $settings['api_key'] ) ? esc_html__( 'المفتاح محفوظ', 'softland-ai' ) : esc_html__( 'إلى الآن ما انحفظ مفتاح', 'softland-ai' ); ?></p>
+			<p><strong><?php esc_html_e( 'ملاحظة:', 'softland-ai' ); ?></strong> <?php esc_html_e( 'الإعدادات الافتراضية مضبوطة أصلًا على طبيعة سوفت لاند: قطع كمبيوتر، تجميعات، إكسسوارات، تقسيط، وصفحات الفروع والخدمة.', 'softland-ai' ); ?></p>
 		</div>
 		<?php
 	}
@@ -218,7 +218,7 @@ final class Softland_AI_Plugin {
 		?>
 		<label>
 			<input type="checkbox" name="<?php echo esc_attr( self::OPTION_KEY ); ?>[enabled]" value="1" <?php checked( $settings['enabled'], '1' ); ?>>
-			<?php esc_html_e( 'Render the floating widget on the frontend', 'softland-ai' ); ?>
+			<?php esc_html_e( 'فعّل الودجت العائم في واجهة الموقع', 'softland-ai' ); ?>
 		</label>
 		<?php
 	}
@@ -227,7 +227,7 @@ final class Softland_AI_Plugin {
 		$settings = $this->settings();
 		?>
 		<input class="regular-text" type="password" name="<?php echo esc_attr( self::OPTION_KEY ); ?>[api_key]" value="<?php echo esc_attr( $settings['api_key'] ); ?>" autocomplete="new-password">
-		<p class="description"><?php esc_html_e( 'Stored server-side and never exposed in the browser.', 'softland-ai' ); ?></p>
+		<p class="description"><?php esc_html_e( 'ينحفظ داخل السيرفر فقط وما يطلع للمتصفح أبدًا.', 'softland-ai' ); ?></p>
 		<?php
 	}
 
@@ -235,7 +235,7 @@ final class Softland_AI_Plugin {
 		$settings = $this->settings();
 		?>
 		<input class="regular-text" type="url" name="<?php echo esc_attr( self::OPTION_KEY ); ?>[base_url]" value="<?php echo esc_attr( $settings['base_url'] ); ?>">
-		<p class="description"><?php esc_html_e( 'Example: https://api.deepseek.com', 'softland-ai' ); ?></p>
+		<p class="description"><?php esc_html_e( 'مثال: https://api.deepseek.com', 'softland-ai' ); ?></p>
 		<?php
 	}
 
@@ -243,7 +243,7 @@ final class Softland_AI_Plugin {
 		$settings = $this->settings();
 		?>
 		<input class="regular-text" type="text" name="<?php echo esc_attr( self::OPTION_KEY ); ?>[model]" value="<?php echo esc_attr( $settings['model'] ); ?>">
-		<p class="description"><?php esc_html_e( 'Example: deepseek-chat', 'softland-ai' ); ?></p>
+		<p class="description"><?php esc_html_e( 'مثال: deepseek-chat', 'softland-ai' ); ?></p>
 		<?php
 	}
 
@@ -258,7 +258,7 @@ final class Softland_AI_Plugin {
 		$settings = $this->settings();
 		?>
 		<input class="regular-text" type="text" name="<?php echo esc_attr( self::OPTION_KEY ); ?>[launcher_text]" value="<?php echo esc_attr( $settings['launcher_text'] ); ?>">
-		<p class="description"><?php esc_html_e( 'Leave empty to auto-switch between Arabic and English defaults.', 'softland-ai' ); ?></p>
+		<p class="description"><?php esc_html_e( 'إذا خليته فاضي بيستخدم النص السعودي الافتراضي تلقائي.', 'softland-ai' ); ?></p>
 		<?php
 	}
 
@@ -266,7 +266,7 @@ final class Softland_AI_Plugin {
 		$settings = $this->settings();
 		?>
 		<textarea class="large-text" rows="5" name="<?php echo esc_attr( self::OPTION_KEY ); ?>[store_profile]"><?php echo esc_textarea( $settings['store_profile'] ); ?></textarea>
-		<p class="description"><?php esc_html_e( 'Describe Softland in one focused paragraph so the AI understands the business and what it should recommend.', 'softland-ai' ); ?></p>
+		<p class="description"><?php esc_html_e( 'اكتب وصف مختصر وواضح عن سوفت لاند عشان المساعد يفهم النشاط ويعرف وش يقترح.', 'softland-ai' ); ?></p>
 		<?php
 	}
 
@@ -274,7 +274,7 @@ final class Softland_AI_Plugin {
 		$settings = $this->settings();
 		?>
 		<textarea class="large-text" rows="4" name="<?php echo esc_attr( self::OPTION_KEY ); ?>[answer_style]"><?php echo esc_textarea( $settings['answer_style'] ); ?></textarea>
-		<p class="description"><?php esc_html_e( 'Guide the tone and format of responses.', 'softland-ai' ); ?></p>
+		<p class="description"><?php esc_html_e( 'حدد لهجة الرد وطريقته بشكل واضح.', 'softland-ai' ); ?></p>
 		<?php
 	}
 
@@ -282,7 +282,7 @@ final class Softland_AI_Plugin {
 		$settings = $this->settings();
 		?>
 		<textarea class="large-text code" rows="6" name="<?php echo esc_attr( self::OPTION_KEY ); ?>[featured_categories]"><?php echo esc_textarea( $settings['featured_categories'] ); ?></textarea>
-		<p class="description"><?php esc_html_e( 'One category name per line. These are boosted in the assistant context.', 'softland-ai' ); ?></p>
+		<p class="description"><?php esc_html_e( 'كل سطر فيه اسم قسم. هالأقسام يعطيها المساعد أولوية أعلى.', 'softland-ai' ); ?></p>
 		<?php
 	}
 
@@ -290,7 +290,7 @@ final class Softland_AI_Plugin {
 		$settings = $this->settings();
 		?>
 		<textarea class="large-text code" rows="6" name="<?php echo esc_attr( self::OPTION_KEY ); ?>[important_pages]"><?php echo esc_textarea( $settings['important_pages'] ); ?></textarea>
-		<p class="description"><?php esc_html_e( 'One page slug or title per line, for example shop, جمع جهازك, عناوين الفروع.', 'softland-ai' ); ?></p>
+		<p class="description"><?php esc_html_e( 'كل سطر فيه عنوان صفحة أو slug، مثل: shop أو جمع جهازك أو عناوين الفروع.', 'softland-ai' ); ?></p>
 		<?php
 	}
 
@@ -298,7 +298,7 @@ final class Softland_AI_Plugin {
 		$settings = $this->settings();
 		?>
 		<textarea class="large-text code" rows="6" name="<?php echo esc_attr( self::OPTION_KEY ); ?>[quick_prompts]"><?php echo esc_textarea( $settings['quick_prompts'] ); ?></textarea>
-		<p class="description"><?php esc_html_e( 'One starter question per line for the suggestion chips.', 'softland-ai' ); ?></p>
+		<p class="description"><?php esc_html_e( 'كل سطر فيه سؤال سريع يظهر للمستخدم كبداية.', 'softland-ai' ); ?></p>
 		<?php
 	}
 
@@ -306,7 +306,7 @@ final class Softland_AI_Plugin {
 		$settings = $this->settings();
 		?>
 		<input class="small-text" type="number" min="2" max="12" name="<?php echo esc_attr( self::OPTION_KEY ); ?>[max_products]" value="<?php echo esc_attr( (string) $settings['max_products'] ); ?>">
-		<p class="description"><?php esc_html_e( 'Higher numbers give broader context but may slow responses.', 'softland-ai' ); ?></p>
+		<p class="description"><?php esc_html_e( 'إذا زاد العدد بيصير السياق أوسع، بس ممكن يبطئ الرد شوي.', 'softland-ai' ); ?></p>
 		<?php
 	}
 
@@ -314,7 +314,7 @@ final class Softland_AI_Plugin {
 		$settings = $this->settings();
 		?>
 		<input class="small-text" type="number" min="2" max="12" name="<?php echo esc_attr( self::OPTION_KEY ); ?>[max_categories]" value="<?php echo esc_attr( (string) $settings['max_categories'] ); ?>">
-		<p class="description"><?php esc_html_e( 'Keeps the category context compact and relevant.', 'softland-ai' ); ?></p>
+		<p class="description"><?php esc_html_e( 'يخلي سياق الأقسام مختصر ومفيد.', 'softland-ai' ); ?></p>
 		<?php
 	}
 
@@ -358,16 +358,16 @@ final class Softland_AI_Plugin {
 				'isRtl'              => $rtl,
 				'isAdmin'            => current_user_can( 'manage_options' ),
 				'widgetLabel'        => $settings['widget_label'],
-				'launcherText'       => $settings['launcher_text'] ? $settings['launcher_text'] : ( $rtl ? 'اسأل سوفت لاند AI' : 'Ask Softland AI' ),
-				'thinking'           => $rtl ? 'جاري تجهيز أفضل اقتراح لك...' : 'Finding the best match for you...',
-				'empty'              => $rtl ? 'اكتب سؤالك أولًا.' : 'Write your question first.',
-				'error'              => $rtl ? 'تعذر الرد الآن. حاول مرة أخرى بعد قليل.' : 'Unable to answer right now. Please try again in a moment.',
-				'userLabel'          => $rtl ? 'أنت' : 'You',
+				'launcherText'       => $settings['launcher_text'] ? $settings['launcher_text'] : 'اسأل سوفت لاند AI',
+				'thinking'           => 'لحظة شوي، أجهز لك أفضل اقتراح...',
+				'empty'              => 'اكتب سؤالك أول.',
+				'error'              => 'حالياً ما قدرت أرد، جرّب بعد شوي.',
+				'userLabel'          => 'أنت',
 				'botLabel'           => $settings['widget_label'],
-				'heading'            => $rtl ? 'ابحث عن القطعة أو الصفحة المناسبة' : 'Find the right product or page',
-				'subheading'         => $rtl ? 'اسأل عن التجميعات، قطع الـ PC، الشاشات، التقسيط، الشحن، الضمان، أو صفحات الفروع.' : 'Ask about builds, PC parts, monitors, installments, shipping, warranty, or store pages.',
-				'placeholder'        => $rtl ? 'مثال: أبغى تجميعة ألعاب قوية أو وين صفحة جمع جهازك؟' : 'Example: I need a strong gaming build or where is the build-your-PC page?',
-				'disclaimer'         => $rtl ? 'قد يخطئ الذكاء الاصطناعي أحيانًا، لذلك راجع تفاصيل المنتج أو الصفحة قبل الشراء.' : 'AI may occasionally make mistakes, so verify product or page details before purchase.',
+				'heading'            => 'دور على القطعة أو الصفحة المناسبة',
+				'subheading'         => 'اسأل عن التجميعات، قطع الـ PC، الشاشات، التقسيط، الشحن، الضمان، أو صفحات الفروع.',
+				'placeholder'        => 'مثال: أبغى تجميعة ألعاب قوية أو وين صفحة جمع جهازك؟',
+				'disclaimer'         => 'الذكاء الاصطناعي ممكن يغلط أحيان، فراجع تفاصيل المنتج أو الصفحة قبل الشراء.',
 				'initialSuggestions' => $this->initial_suggestions(),
 			)
 		);
@@ -386,22 +386,12 @@ final class Softland_AI_Plugin {
 			return array_slice( $custom, 0, 5 );
 		}
 
-		if ( $this->is_rtl_lang() ) {
-			return array(
-				'أبغى تجميعة ألعاب قوية',
-				'أبحث عن شاشة مناسبة للقيمنق',
-				'وين صفحة جمع جهازك؟',
-				'كيف أعرف الشحن والضمان؟',
-				'هل عندكم تقسيط؟',
-			);
-		}
-
 		return array(
-			'I need a strong gaming PC build',
-			'Show me gaming monitors',
-			'Where is the build-your-PC page?',
-			'How do shipping and warranty work?',
-			'Do you offer installments?',
+			'أبغى تجميعة ألعاب قوية',
+			'أبي شاشة مناسبة للقيمنق',
+			'وين صفحة جمع جهازك؟',
+			'كيف أعرف الشحن والضمان؟',
+			'هل عندكم تقسيط؟',
 		);
 	}
 
@@ -436,7 +426,7 @@ final class Softland_AI_Plugin {
 		<div class="softland-ai" data-softland-ai dir="<?php echo esc_attr( $rtl ? 'rtl' : 'ltr' ); ?>">
 			<button class="softland-ai__launcher" type="button" data-softland-ai-launcher aria-expanded="false" aria-controls="softland-ai-panel">
 				<span class="softland-ai__spark" aria-hidden="true">✦</span>
-				<span><?php echo esc_html( $settings['launcher_text'] ? $settings['launcher_text'] : ( $rtl ? 'اسأل سوفت لاند AI' : 'Ask Softland AI' ) ); ?></span>
+				<span><?php echo esc_html( $settings['launcher_text'] ? $settings['launcher_text'] : 'اسأل سوفت لاند AI' ); ?></span>
 			</button>
 
 			<section class="softland-ai__panel" id="softland-ai-panel" data-softland-ai-panel hidden aria-hidden="true">
@@ -444,16 +434,16 @@ final class Softland_AI_Plugin {
 					<div class="softland-ai__head">
 						<div>
 							<strong><?php echo esc_html( $settings['widget_label'] ); ?></strong>
-							<p><?php echo esc_html( $rtl ? 'اسأل عن المنتجات، التجميعات، التقسيط، الشحن، الضمان، أو أي صفحة مهمة داخل المتجر.' : 'Ask about products, builds, installments, shipping, warranty, or any important page in the store.' ); ?></p>
+							<p><?php echo esc_html( 'اسأل عن المنتجات، التجميعات، التقسيط، الشحن، الضمان، أو أي صفحة مهمة داخل المتجر.' ); ?></p>
 						</div>
-						<button class="softland-ai__close" type="button" data-softland-ai-close aria-label="<?php echo esc_attr( $rtl ? 'إغلاق' : 'Close' ); ?>">×</button>
+						<button class="softland-ai__close" type="button" data-softland-ai-close aria-label="<?php echo esc_attr( 'إغلاق' ); ?>">×</button>
 					</div>
 
 					<div class="softland-ai__body">
 						<div class="softland-ai__intro" data-softland-ai-intro>
 							<span class="softland-ai__hero-icon" aria-hidden="true">✦</span>
-							<h3><?php echo esc_html( $rtl ? 'ابدأ بسؤال سريع' : 'Start with a quick question' ); ?></h3>
-							<p><?php echo esc_html( $rtl ? 'المساعد يفهم صفحات سوفت لاند ويقترح لك أقرب منتج أو فئة أو رابط مفيد.' : 'The assistant understands Softland pages and suggests the closest product, collection, or helpful link.' ); ?></p>
+							<h3><?php echo esc_html( 'ابدأ بسؤال سريع' ); ?></h3>
+							<p><?php echo esc_html( 'المساعد يفهم صفحات سوفت لاند ويقترح لك أقرب منتج أو فئة أو رابط يفيدك.' ); ?></p>
 						</div>
 
 						<div class="softland-ai__chips" data-softland-ai-chips></div>
@@ -462,12 +452,12 @@ final class Softland_AI_Plugin {
 					</div>
 
 					<form class="softland-ai__composer" data-softland-ai-form>
-						<label class="screen-reader-text" for="softland-ai-input"><?php echo esc_html( $rtl ? 'سؤال المساعد' : 'Assistant prompt' ); ?></label>
-						<textarea id="softland-ai-input" name="message" rows="3" data-softland-ai-input placeholder="<?php echo esc_attr( $rtl ? 'مثال: أبحث عن كرت شاشة أو أبغى صفحة جمع جهازك' : 'Example: I need a graphics card or the build-your-PC page' ); ?>"></textarea>
-						<button class="softland-ai__submit" type="submit" data-softland-ai-submit aria-label="<?php echo esc_attr( $rtl ? 'إرسال' : 'Send' ); ?>">→</button>
+						<label class="screen-reader-text" for="softland-ai-input"><?php echo esc_html( 'سؤال المساعد' ); ?></label>
+						<textarea id="softland-ai-input" name="message" rows="3" data-softland-ai-input placeholder="<?php echo esc_attr( 'مثال: أبي كرت شاشة أو أبغى صفحة جمع جهازك' ); ?>"></textarea>
+						<button class="softland-ai__submit" type="submit" data-softland-ai-submit aria-label="<?php echo esc_attr( 'إرسال' ); ?>">→</button>
 					</form>
 
-					<p class="softland-ai__disclaimer"><?php echo esc_html( $rtl ? 'قد يخطئ الذكاء الاصطناعي أحيانًا، لذلك راجع تفاصيل المنتج أو الصفحة قبل اعتماد القرار.' : 'AI may occasionally make mistakes, so verify product or page details before making a decision.' ); ?></p>
+					<p class="softland-ai__disclaimer"><?php echo esc_html( 'الذكاء الاصطناعي ممكن يغلط أحيان، فراجع تفاصيل المنتج أو الصفحة قبل ما تعتمد قرارك.' ); ?></p>
 				</div>
 			</section>
 		</div>
@@ -485,7 +475,7 @@ final class Softland_AI_Plugin {
 		if ( '' === $message ) {
 			wp_send_json_error(
 				array(
-					'message' => $this->is_rtl_lang() ? 'اكتب سؤالك أولًا.' : 'Write your question first.',
+					'message' => 'اكتب سؤالك أول.',
 				),
 				400
 			);
@@ -525,12 +515,12 @@ final class Softland_AI_Plugin {
 		$system_prompt = implode(
 			"\n",
 			array(
-				'You are Softland AI, a concise ecommerce shopping assistant for Softland.',
-				'Reply in the same language as the user.',
+				'You are Softland AI, an ecommerce shopping assistant for Softland.',
+				'Always reply in Saudi Arabic dialect, even if the user writes in another language, unless the user explicitly asks you to switch language.',
 				'Use only the provided store context and never invent stock, pricing, shipping, or warranty details.',
 				'Prefer the most relevant product, category, or page link inside the site.',
-				'Keep the answer short, helpful, and action-oriented.',
-				'If the question is outside the available context, be honest and guide the user to the closest page.',
+				'Keep the answer short, helpful, action-oriented, and natural in Saudi dialect.',
+				'If the question is outside the available context, be honest and guide the user to the closest page in Saudi dialect.',
 				'Return only valid JSON with keys: answer, suggestions, links.',
 				'links must be an array of objects with label and url.',
 				'Store profile: ' . $settings['store_profile'],
@@ -593,12 +583,12 @@ final class Softland_AI_Plugin {
 
 		if ( $page_id && get_permalink( $page_id ) ) {
 			$links[] = array(
-				'label' => $this->is_rtl_lang() ? 'الصفحة الحالية' : 'Current page',
+				'label' => 'الصفحة الحالية',
 				'url'   => get_permalink( $page_id ),
 			);
 		} elseif ( ! empty( $page['url'] ) ) {
 			$links[] = array(
-				'label' => $this->is_rtl_lang() ? 'الصفحة الحالية' : 'Current page',
+				'label' => 'الصفحة الحالية',
 				'url'   => $page['url'],
 			);
 		}
@@ -638,12 +628,12 @@ final class Softland_AI_Plugin {
 
 		if ( $page_id && get_permalink( $page_id ) ) {
 			$links[] = array(
-				'label' => $this->is_rtl_lang() ? 'الصفحة الحالية' : 'Current page',
+				'label' => 'الصفحة الحالية',
 				'url'   => get_permalink( $page_id ),
 			);
 		} elseif ( ! empty( $page['url'] ) ) {
 			$links[] = array(
-				'label' => $this->is_rtl_lang() ? 'الصفحة الحالية' : 'Current page',
+				'label' => 'الصفحة الحالية',
 				'url'   => $page['url'],
 			);
 		}
@@ -652,18 +642,12 @@ final class Softland_AI_Plugin {
 		$mentions_shipping = false !== strpos( $message_lower, 'شحن' ) || false !== strpos( $message_lower, 'shipping' ) || false !== strpos( $message_lower, 'ضمان' ) || false !== strpos( $message_lower, 'warranty' );
 		$mentions_installment = false !== strpos( $message_lower, 'تقسيط' ) || false !== strpos( $message_lower, 'tabby' ) || false !== strpos( $message_lower, 'tamara' ) || false !== strpos( $message_lower, 'installment' );
 
-		$answer = $this->is_rtl_lang()
-			? 'أستطيع مساعدتك في الوصول السريع إلى المنتجات، التصنيفات، وصفحات المتجر المهمة داخل سوفت لاند. اذكر اسم القطعة أو نوع الاستخدام مثل تجميعة ألعاب، كرت شاشة، شاشة، شحن، أو تقسيط وسأوجهك لأقرب نتيجة.'
-			: 'I can help you quickly reach the right products, categories, and important Softland store pages. Mention the item or use case, like gaming build, graphics card, monitor, shipping, or installments, and I will point you to the closest result.';
+		$answer = 'أقدر أساعدك توصل بسرعة للمنتجات، الأقسام، وصفحات المتجر المهمة داخل سوفت لاند. اذكر اسم القطعة أو استخدامك مثل تجميعة ألعاب، كرت شاشة، شاشة، شحن، أو تقسيط وبوجّهك لأقرب نتيجة.';
 
 		if ( $mentions_shipping ) {
-			$answer = $this->is_rtl_lang()
-				? 'لأسئلة الشحن أو الضمان، افتح صفحات الشروط أو الفروع أو ابحث داخل المتجر عن المنتج نفسه لمراجعة التفاصيل النهائية.'
-				: 'For shipping or warranty questions, open the policy or branch pages, or check the product page itself for the final details.';
+			$answer = 'إذا سؤالك عن الشحن أو الضمان، افتح صفحة الشروط أو الفروع أو ادخل على صفحة المنتج نفسه عشان تشوف التفاصيل النهائية.';
 		} elseif ( $mentions_installment ) {
-			$answer = $this->is_rtl_lang()
-				? 'إذا كنت تبحث عن التقسيط، ابدأ بصفحات العروض أو المتجر أو المنتجات المناسبة، ثم راجع التفاصيل النهائية داخل صفحة المنتج أو صفحة الشروط.'
-				: 'If you are looking for installments, start with the offers or shop pages, then verify the final terms on the product or policy page.';
+			$answer = 'إذا تبي تقسيط، ابدأ من صفحات العروض أو المتجر أو المنتجات المناسبة، وبعدها راجع الشروط النهائية داخل صفحة المنتج أو صفحة الشروط.';
 		}
 
 		return array(
@@ -871,7 +855,7 @@ final class Softland_AI_Plugin {
 	private function important_links() {
 		$links = array(
 			array(
-				'label' => $this->is_rtl_lang() ? 'الرئيسية' : 'Home',
+				'label' => 'الرئيسية',
 				'url'   => home_url( '/' ),
 			),
 		);
@@ -879,7 +863,7 @@ final class Softland_AI_Plugin {
 		$shop_url = $this->get_shop_url();
 		if ( $shop_url ) {
 			$links[] = array(
-				'label' => $this->is_rtl_lang() ? 'المتجر' : 'Shop',
+				'label' => 'المتجر',
 				'url'   => $shop_url,
 			);
 		}
@@ -1115,13 +1099,13 @@ final class Softland_AI_Plugin {
 
 		if ( $shop_url ) {
 			return array(
-				'label' => $this->is_rtl_lang() ? 'نتائج البحث في المتجر' : 'Shop search results',
+				'label' => 'نتائج البحث في المتجر',
 				'url'   => add_query_arg( 's', rawurlencode( $message ), $shop_url ),
 			);
 		}
 
 		return array(
-			'label' => $this->is_rtl_lang() ? 'نتائج البحث' : 'Search results',
+			'label' => 'نتائج البحث',
 			'url'   => add_query_arg( 's', rawurlencode( $message ), home_url( '/' ) ),
 		);
 	}
@@ -1132,10 +1116,10 @@ final class Softland_AI_Plugin {
 	private function core_store_pages() {
 		$pages = array();
 		$labels = array(
-			'shop'      => $this->is_rtl_lang() ? 'المتجر' : 'Shop',
-			'cart'      => $this->is_rtl_lang() ? 'السلة' : 'Cart',
-			'checkout'  => $this->is_rtl_lang() ? 'الدفع' : 'Checkout',
-			'myaccount' => $this->is_rtl_lang() ? 'حسابي' : 'My account',
+			'shop'      => 'المتجر',
+			'cart'      => 'السلة',
+			'checkout'  => 'الدفع',
+			'myaccount' => 'حسابي',
 		);
 
 		foreach ( $labels as $key => $label ) {
