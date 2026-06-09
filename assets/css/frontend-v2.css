@@ -52,6 +52,7 @@
 
 #softland-ai-input {
   color: #000;
+  min-height: 96px;
 }
 
 .softland-ai__submit {
