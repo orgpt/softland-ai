@@ -41,8 +41,7 @@
 	padding: 0.72rem 1.2rem;
 	border: 1px solid var(--softland-launcher-border);
 	border-radius: 0;
-	background:
-		linear-gradient(180deg, var(--softland-launcher-bg), var(--softland-launcher-bg-2));
+	background:linear-gradient(135deg, rgba(255, 255, 255, 0.02), rgba(255, 77, 179, 0.03)), linear-gradient(135deg, #f59923, #e71b2d);
 	box-shadow: 0 12px 24px rgba(26, 8, 34, 0.24);
 	color: #ffffff !important;
 	font-size: 0.86rem;
