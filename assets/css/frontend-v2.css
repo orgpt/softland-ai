@@ -66,6 +66,16 @@
 	border-color: #cf4cc2;
 }
 
+.softland-ai__launcher::after {
+	content: "";
+	position: absolute;
+	inset: -6px;
+	border-radius: inherit;
+	border: 1px solid rgba(255, 77, 161, 0);
+	opacity: 0;
+	pointer-events: none;
+}
+
 .softland-ai__spark,
 .softland-ai__hero-icon {
 	color: #fff;
@@ -321,7 +331,9 @@
 
 @media (max-width: 640px) {
 	.softland-ai {
-		inset-inline: 10px;
+		inset-inline: auto;
+		inset-inline-start: 10px;
+		inset-inline-end: auto;
 		inset-block-end: 50px;
 	}
 
@@ -333,9 +345,38 @@
 	}
 
 	.softland-ai__launcher {
-		inline-size: auto;
+		position: relative;
+		inline-size: 58px;
+		min-inline-size: 58px;
+		block-size: 58px;
+		min-block-size: 58px;
+		padding: 0;
 		justify-content: center;
-		max-inline-size: 210px;
+		border-radius: 999px;
+		max-inline-size: 58px;
+		font-size: 0;
+		box-shadow: 0 10px 22px rgba(26, 8, 34, 0.3);
+		animation: softland-ai-pulse 2.2s ease-out infinite;
+	}
+
+	.softland-ai__launcher span:last-child {
+		display: none;
+	}
+
+	.softland-ai__launcher .softland-ai__spark {
+		display: none;
+	}
+
+	.softland-ai__launcher::before {
+		content: "AI";
+		font-size: 0.98rem;
+		font-weight: 900;
+		letter-spacing: 0.02em;
+		color: #fff7fb;
+	}
+
+	.softland-ai__launcher::after {
+		opacity: 1;
 	}
 
 	.softland-ai__panel {
@@ -406,5 +447,19 @@
 		inset-inline-end: 10px;
 		inset-block-end: 10px;
 		font-size: 0.9rem;
+	}
+}
+
+@keyframes softland-ai-pulse {
+	0% {
+		box-shadow: 0 10px 22px rgba(26, 8, 34, 0.3), 0 0 0 0 rgba(179, 70, 199, 0.34);
+	}
+
+	70% {
+		box-shadow: 0 10px 22px rgba(26, 8, 34, 0.3), 0 0 0 10px rgba(179, 70, 199, 0);
+	}
+
+	100% {
+		box-shadow: 0 10px 22px rgba(26, 8, 34, 0.3), 0 0 0 0 rgba(179, 70, 199, 0);
 	}
 }
