@@ -331,16 +331,20 @@
 
 @media (max-width: 640px) {
 	.softland-ai {
+		left: 10px;
+		right: auto;
 		inset-inline: auto;
-		inset-inline-start: 10px;
+		inset-inline-start: auto;
 		inset-inline-end: auto;
 		inset-block-end: 50px;
 	}
 
 	[dir="rtl"].softland-ai,
 	[dir="ltr"].softland-ai {
+		left: 10px;
+		right: auto;
 		inset-inline: auto;
-		inset-inline-start: 10px;
+		inset-inline-start: auto;
 		inset-inline-end: auto;
 	}
 
@@ -381,11 +385,13 @@
 
 	.softland-ai__panel {
 		position: fixed;
-		inset-inline: 10px;
-		inset-inline-start: 10px;
+		left: 10px;
+		right: auto;
+		inset-inline: auto;
+		inset-inline-start: auto;
 		inset-inline-end: auto;
 		inset-block-end: 112px;
-		inline-size: auto;
+		inline-size: min(330px, calc(100vw - 20px));
 		max-block-size: calc(100dvh - 124px);
 	}
 

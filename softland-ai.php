@@ -3,7 +3,7 @@
  * Plugin Name: Softland AI
  * Plugin URI: https://softland.app/
  * Description: Floating AI assistant widget for WordPress with DeepSeek integration, multilingual UI support, contextual answers, and admin API settings.
- * Version: 1.1.5
+ * Version: 1.1.6
  * Author: Softland
  * Author URI: https://softland.app/
  * Text Domain: softland-ai
@@ -331,14 +331,14 @@ final class Softland_AI_Plugin {
 			'softland-ai-frontend',
 			$this->plugin_url( 'assets/css/frontend-v2.css' ),
 			array(),
-			file_exists( $this->plugin_path( 'assets/css/frontend-v2.css' ) ) ? filemtime( $this->plugin_path( 'assets/css/frontend-v2.css' ) ) : '1.1.5'
+			file_exists( $this->plugin_path( 'assets/css/frontend-v2.css' ) ) ? filemtime( $this->plugin_path( 'assets/css/frontend-v2.css' ) ) : '1.1.6'
 		);
 
 		wp_enqueue_script(
 			'softland-ai-frontend',
 			$this->plugin_url( 'assets/js/frontend.js' ),
 			array(),
-			file_exists( $this->plugin_path( 'assets/js/frontend.js' ) ) ? filemtime( $this->plugin_path( 'assets/js/frontend.js' ) ) : '1.1.5',
+			file_exists( $this->plugin_path( 'assets/js/frontend.js' ) ) ? filemtime( $this->plugin_path( 'assets/js/frontend.js' ) ) : '1.1.6',
 			true
 		);
 
