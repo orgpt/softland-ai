@@ -50,6 +50,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
 
+  setOpen(false);
+
   const setBusy = (busy) => {
     root.classList.toggle('is-busy', busy);
     if (submit) {
