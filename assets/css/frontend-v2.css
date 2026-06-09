@@ -258,6 +258,9 @@
 
 .softland-ai__composer {
 	position: relative;
+	height: 100px !important;
+    border: 1px solid #ff6060;
+	border-radius: 20px;
 }
 
 .softland-ai__composer textarea {
