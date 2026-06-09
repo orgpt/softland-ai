@@ -54,6 +54,11 @@
   color: #000;
 }
 
+.softland-ai__submit {
+  color: #fff;
+  background: #e81d2e;
+}
+
 .softland-ai__launcher:hover {
 	transform: translateY(-1px);
 	box-shadow: 0 16px 28px rgba(26, 8, 34, 0.28);
@@ -313,7 +318,7 @@
 @media (max-width: 640px) {
 	.softland-ai {
 		inset-inline: 10px;
-		inset-block-end: 10px;
+		inset-block-end: 50px;
 	}
 
 	[dir="rtl"].softland-ai,
@@ -332,16 +337,18 @@
 	.softland-ai__panel {
 		position: fixed;
 		inset-inline: 10px;
-		inset-block-end: 72px;
+		inset-inline-start: 10px;
+		inset-inline-end: auto;
+		inset-block-end: 112px;
 		inline-size: auto;
-		max-block-size: calc(100dvh - 84px);
+		max-block-size: calc(100dvh - 124px);
 	}
 
 	.softland-ai__card {
 		gap: 0.45rem;
 		padding: 0.72rem;
 		border-radius: 0 0 22px 22px;
-		max-block-size: calc(100dvh - 84px);
+		max-block-size: calc(100dvh - 124px);
 		overflow: auto;
 	}
 
