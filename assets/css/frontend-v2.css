@@ -318,7 +318,9 @@
 
 	[dir="rtl"].softland-ai,
 	[dir="ltr"].softland-ai {
-		inset-inline: 10px;
+		inset-inline: auto;
+		inset-inline-start: 10px;
+		inset-inline-end: auto;
 	}
 
 	.softland-ai__launcher {
