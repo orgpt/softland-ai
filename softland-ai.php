@@ -3,7 +3,7 @@
  * Plugin Name: Softland AI
  * Plugin URI: https://softland.app/
  * Description: Floating AI assistant widget for WordPress with DeepSeek integration, multilingual UI support, contextual answers, and admin API settings.
- * Version: 1.1.1
+ * Version: 1.1.2
  * Author: Softland
  * Author URI: https://softland.app/
  * Text Domain: softland-ai
@@ -331,14 +331,14 @@ final class Softland_AI_Plugin {
 			'softland-ai-frontend',
 			$this->plugin_url( 'assets/css/frontend-v2.css' ),
 			array(),
-			file_exists( $this->plugin_path( 'assets/css/frontend-v2.css' ) ) ? filemtime( $this->plugin_path( 'assets/css/frontend-v2.css' ) ) : '1.1.1'
+			file_exists( $this->plugin_path( 'assets/css/frontend-v2.css' ) ) ? filemtime( $this->plugin_path( 'assets/css/frontend-v2.css' ) ) : '1.1.2'
 		);
 
 		wp_enqueue_script(
 			'softland-ai-frontend',
 			$this->plugin_url( 'assets/js/frontend.js' ),
 			array(),
-			file_exists( $this->plugin_path( 'assets/js/frontend.js' ) ) ? filemtime( $this->plugin_path( 'assets/js/frontend.js' ) ) : '1.1.1',
+			file_exists( $this->plugin_path( 'assets/js/frontend.js' ) ) ? filemtime( $this->plugin_path( 'assets/js/frontend.js' ) ) : '1.1.2',
 			true
 		);
 
@@ -390,7 +390,6 @@ final class Softland_AI_Plugin {
 			'أبغى تجميعة ألعاب قوية',
 			'أبي شاشة مناسبة للقيمنق',
 			'وين صفحة جمع جهازك؟',
-			'كيف أعرف الشحن والضمان؟',
 			'هل عندكم تقسيط؟',
 		);
 	}
@@ -443,7 +442,6 @@ final class Softland_AI_Plugin {
 						<div class="softland-ai__intro" data-softland-ai-intro>
 							<span class="softland-ai__hero-icon" aria-hidden="true">✦</span>
 							<h3><?php echo esc_html( 'ابدأ بسؤال سريع' ); ?></h3>
-							<p><?php echo esc_html( 'المساعد يفهم صفحات سوفت لاند ويقترح لك أقرب منتج أو فئة أو رابط يفيدك.' ); ?></p>
 						</div>
 
 						<div class="softland-ai__chips" data-softland-ai-chips></div>
