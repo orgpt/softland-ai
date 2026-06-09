@@ -74,7 +74,6 @@
 	position: absolute;
 	inset-block: 0;
 	inset-inline-end: 0;
-	inline-size: 28%;
 	background: linear-gradient(180deg, var(--softland-launcher-accent-red), var(--softland-launcher-accent-orange));
 	opacity: 1;
 	pointer-events: none;
