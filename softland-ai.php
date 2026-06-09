@@ -3,7 +3,7 @@
  * Plugin Name: Softland AI
  * Plugin URI: https://softland.app/
  * Description: Floating AI assistant widget for WordPress with DeepSeek integration, multilingual UI support, contextual answers, and admin API settings.
- * Version: 1.0.0
+ * Version: 1.1.0
  * Author: Softland
  * Author URI: https://softland.app/
  * Text Domain: softland-ai
@@ -16,6 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 final class Softland_AI_Plugin {
 	const OPTION_KEY = 'softland_ai_settings';
 	const NONCE_KEY  = 'softland_ai_nonce';
+	const CACHE_KEY  = 'softland_ai_store_context_v1';
 
 	/**
 	 * Boot plugin.
@@ -36,6 +37,12 @@ final class Softland_AI_Plugin {
 		add_shortcode( 'softland_ai_widget', array( $this, 'shortcode_widget' ) );
 		add_action( 'wp_ajax_softland_ai_chat', array( $this, 'ajax_chat' ) );
 		add_action( 'wp_ajax_nopriv_softland_ai_chat', array( $this, 'ajax_chat' ) );
+		add_action( 'save_post', array( $this, 'flush_store_context_cache' ) );
+		add_action( 'deleted_post', array( $this, 'flush_store_context_cache' ) );
+		add_action( 'created_term', array( $this, 'flush_store_context_cache' ) );
+		add_action( 'edited_term', array( $this, 'flush_store_context_cache' ) );
+		add_action( 'delete_term', array( $this, 'flush_store_context_cache' ) );
+		add_action( 'update_option_' . self::OPTION_KEY, array( $this, 'flush_store_context_cache' ), 10, 0 );
 	}
 
 	/**
@@ -45,12 +52,19 @@ final class Softland_AI_Plugin {
 	 */
 	private function defaults() {
 		return array(
-			'enabled'       => '1',
-			'api_key'       => '',
-			'base_url'      => 'https://api.deepseek.com',
-			'model'         => 'deepseek-chat',
-			'widget_label'  => 'Softland AI',
-			'launcher_text' => '',
+			'enabled'             => '1',
+			'api_key'             => '',
+			'base_url'            => 'https://api.deepseek.com',
+			'model'               => 'deepseek-chat',
+			'widget_label'        => 'سوفت لاند AI',
+			'launcher_text'       => '',
+			'store_profile'       => 'سوفت لاند متجر ووردبريس/ووكومرس متخصص في قطع الكمبيوتر، التجميعات الجاهزة، تجميع جهازك، الشاشات، الملحقات، الإكسسوارات، وورك ستيشن، وعروض التقسيط داخل السعودية. ركز على توجيه المستخدم بسرعة لأقرب منتج أو تصنيف أو صفحة مفيدة داخل المتجر.',
+			'answer_style'        => 'اجعل الرد قصيرًا وواضحًا وعمليًا. اذكر المنتج أو التصنيف أو الصفحة المناسبة أولًا، ثم أضف خطوة تالية بسيطة مثل: افتح الرابط، تصفح الفئة، أو استخدم البحث.',
+			'featured_categories' => "التجميعات\nمكونات الـPC\nالشاشات\nالملحقات\nالاكسسوارات\nورك ستيشن",
+			'important_pages'     => "shop\nالمتجر\nجمع جهازك\nعناوين الفروع\nabout-softland\nالشروط الأحكام",
+			'quick_prompts'       => "أبغى تجميعة ألعاب قوية\nأبحث عن كرت شاشة مناسب\nوين صفحة جمع جهازك؟\nكيف أعرف الشحن والضمان؟\nهل عندكم تقسيط؟",
+			'max_products'        => 6,
+			'max_categories'      => 6,
 		);
 	}
 
@@ -116,19 +130,36 @@ final class Softland_AI_Plugin {
 
 		add_settings_section(
 			'softland_ai_api',
-			__( 'DeepSeek Settings', 'softland-ai' ),
+			__( 'AI Connection', 'softland-ai' ),
 			function () {
-				echo '<p>' . esc_html__( 'Configure DeepSeek API access for the floating AI widget.', 'softland-ai' ) . '</p>';
+				echo '<p>' . esc_html__( 'Configure the API credentials and model used by the Softland assistant.', 'softland-ai' ) . '</p>';
 			},
 			'softland-ai'
 		);
 
 		add_settings_field( 'enabled', __( 'Enable Widget', 'softland-ai' ), array( $this, 'field_enabled' ), 'softland-ai', 'softland_ai_api' );
-		add_settings_field( 'api_key', __( 'DeepSeek API Key', 'softland-ai' ), array( $this, 'field_api_key' ), 'softland-ai', 'softland_ai_api' );
-		add_settings_field( 'base_url', __( 'DeepSeek Base URL', 'softland-ai' ), array( $this, 'field_base_url' ), 'softland-ai', 'softland_ai_api' );
-		add_settings_field( 'model', __( 'DeepSeek Model', 'softland-ai' ), array( $this, 'field_model' ), 'softland-ai', 'softland_ai_api' );
-		add_settings_field( 'widget_label', __( 'Widget Label', 'softland-ai' ), array( $this, 'field_widget_label' ), 'softland-ai', 'softland_ai_api' );
+		add_settings_field( 'api_key', __( 'API Key', 'softland-ai' ), array( $this, 'field_api_key' ), 'softland-ai', 'softland_ai_api' );
+		add_settings_field( 'base_url', __( 'Base URL', 'softland-ai' ), array( $this, 'field_base_url' ), 'softland-ai', 'softland_ai_api' );
+		add_settings_field( 'model', __( 'Model', 'softland-ai' ), array( $this, 'field_model' ), 'softland-ai', 'softland_ai_api' );
+		add_settings_field( 'widget_label', __( 'Assistant Name', 'softland-ai' ), array( $this, 'field_widget_label' ), 'softland-ai', 'softland_ai_api' );
 		add_settings_field( 'launcher_text', __( 'Launcher Text', 'softland-ai' ), array( $this, 'field_launcher_text' ), 'softland-ai', 'softland_ai_api' );
+
+		add_settings_section(
+			'softland_ai_store',
+			__( 'Store Intelligence', 'softland-ai' ),
+			function () {
+				echo '<p>' . esc_html__( 'Teach the assistant how Softland should answer and which parts of the store matter most.', 'softland-ai' ) . '</p>';
+			},
+			'softland-ai'
+		);
+
+		add_settings_field( 'store_profile', __( 'Store Profile', 'softland-ai' ), array( $this, 'field_store_profile' ), 'softland-ai', 'softland_ai_store' );
+		add_settings_field( 'answer_style', __( 'Reply Style', 'softland-ai' ), array( $this, 'field_answer_style' ), 'softland-ai', 'softland_ai_store' );
+		add_settings_field( 'featured_categories', __( 'Featured Categories', 'softland-ai' ), array( $this, 'field_featured_categories' ), 'softland-ai', 'softland_ai_store' );
+		add_settings_field( 'important_pages', __( 'Important Pages', 'softland-ai' ), array( $this, 'field_important_pages' ), 'softland-ai', 'softland_ai_store' );
+		add_settings_field( 'quick_prompts', __( 'Quick Prompts', 'softland-ai' ), array( $this, 'field_quick_prompts' ), 'softland-ai', 'softland_ai_store' );
+		add_settings_field( 'max_products', __( 'Products In Context', 'softland-ai' ), array( $this, 'field_max_products' ), 'softland-ai', 'softland_ai_store' );
+		add_settings_field( 'max_categories', __( 'Categories In Context', 'softland-ai' ), array( $this, 'field_max_categories' ), 'softland-ai', 'softland_ai_store' );
 	}
 
 	/**
@@ -142,12 +173,19 @@ final class Softland_AI_Plugin {
 		$input    = is_array( $input ) ? $input : array();
 
 		return array(
-			'enabled'       => empty( $input['enabled'] ) ? '0' : '1',
-			'api_key'       => sanitize_text_field( $input['api_key'] ?? $defaults['api_key'] ),
-			'base_url'      => untrailingslashit( esc_url_raw( $input['base_url'] ?? $defaults['base_url'] ) ),
-			'model'         => sanitize_text_field( $input['model'] ?? $defaults['model'] ),
-			'widget_label'  => sanitize_text_field( $input['widget_label'] ?? $defaults['widget_label'] ),
-			'launcher_text' => sanitize_text_field( $input['launcher_text'] ?? $defaults['launcher_text'] ),
+			'enabled'             => empty( $input['enabled'] ) ? '0' : '1',
+			'api_key'             => sanitize_text_field( $input['api_key'] ?? $defaults['api_key'] ),
+			'base_url'            => untrailingslashit( esc_url_raw( $input['base_url'] ?? $defaults['base_url'] ) ),
+			'model'               => sanitize_text_field( $input['model'] ?? $defaults['model'] ),
+			'widget_label'        => sanitize_text_field( $input['widget_label'] ?? $defaults['widget_label'] ),
+			'launcher_text'       => sanitize_text_field( $input['launcher_text'] ?? $defaults['launcher_text'] ),
+			'store_profile'       => sanitize_textarea_field( $input['store_profile'] ?? $defaults['store_profile'] ),
+			'answer_style'        => sanitize_textarea_field( $input['answer_style'] ?? $defaults['answer_style'] ),
+			'featured_categories' => sanitize_textarea_field( $input['featured_categories'] ?? $defaults['featured_categories'] ),
+			'important_pages'     => sanitize_textarea_field( $input['important_pages'] ?? $defaults['important_pages'] ),
+			'quick_prompts'       => sanitize_textarea_field( $input['quick_prompts'] ?? $defaults['quick_prompts'] ),
+			'max_products'        => max( 2, min( 12, absint( $input['max_products'] ?? $defaults['max_products'] ) ) ),
+			'max_categories'      => max( 2, min( 12, absint( $input['max_categories'] ?? $defaults['max_categories'] ) ) ),
 		);
 	}
 
@@ -159,7 +197,7 @@ final class Softland_AI_Plugin {
 		?>
 		<div class="wrap">
 			<h1><?php esc_html_e( 'Softland AI', 'softland-ai' ); ?></h1>
-			<p><?php esc_html_e( 'Floating AI assistant with DeepSeek integration for WordPress.', 'softland-ai' ); ?></p>
+			<p><?php esc_html_e( 'AI shopping assistant for Softland WooCommerce pages, products, collections, and support links.', 'softland-ai' ); ?></p>
 			<form method="post" action="options.php">
 				<?php settings_fields( 'softland_ai_group' ); ?>
 				<?php do_settings_sections( 'softland-ai' ); ?>
@@ -167,6 +205,7 @@ final class Softland_AI_Plugin {
 			</form>
 			<hr>
 			<p><strong><?php esc_html_e( 'Saved API key status:', 'softland-ai' ); ?></strong> <?php echo ! empty( $settings['api_key'] ) ? esc_html__( 'API key saved', 'softland-ai' ) : esc_html__( 'No API key saved yet', 'softland-ai' ); ?></p>
+			<p><strong><?php esc_html_e( 'Optimization note:', 'softland-ai' ); ?></strong> <?php esc_html_e( 'Default prompts and store profile are pre-tuned for Softland computer parts, gaming PCs, accessories, installments, and branch/service pages.', 'softland-ai' ); ?></p>
 		</div>
 		<?php
 	}
@@ -188,7 +227,7 @@ final class Softland_AI_Plugin {
 		$settings = $this->settings();
 		?>
 		<input class="regular-text" type="password" name="<?php echo esc_attr( self::OPTION_KEY ); ?>[api_key]" value="<?php echo esc_attr( $settings['api_key'] ); ?>" autocomplete="new-password">
-		<p class="description"><?php esc_html_e( 'Paste your DeepSeek secret key here. It is only used server-side.', 'softland-ai' ); ?></p>
+		<p class="description"><?php esc_html_e( 'Stored server-side and never exposed in the browser.', 'softland-ai' ); ?></p>
 		<?php
 	}
 
@@ -196,6 +235,7 @@ final class Softland_AI_Plugin {
 		$settings = $this->settings();
 		?>
 		<input class="regular-text" type="url" name="<?php echo esc_attr( self::OPTION_KEY ); ?>[base_url]" value="<?php echo esc_attr( $settings['base_url'] ); ?>">
+		<p class="description"><?php esc_html_e( 'Example: https://api.deepseek.com', 'softland-ai' ); ?></p>
 		<?php
 	}
 
@@ -222,6 +262,62 @@ final class Softland_AI_Plugin {
 		<?php
 	}
 
+	public function field_store_profile() {
+		$settings = $this->settings();
+		?>
+		<textarea class="large-text" rows="5" name="<?php echo esc_attr( self::OPTION_KEY ); ?>[store_profile]"><?php echo esc_textarea( $settings['store_profile'] ); ?></textarea>
+		<p class="description"><?php esc_html_e( 'Describe Softland in one focused paragraph so the AI understands the business and what it should recommend.', 'softland-ai' ); ?></p>
+		<?php
+	}
+
+	public function field_answer_style() {
+		$settings = $this->settings();
+		?>
+		<textarea class="large-text" rows="4" name="<?php echo esc_attr( self::OPTION_KEY ); ?>[answer_style]"><?php echo esc_textarea( $settings['answer_style'] ); ?></textarea>
+		<p class="description"><?php esc_html_e( 'Guide the tone and format of responses.', 'softland-ai' ); ?></p>
+		<?php
+	}
+
+	public function field_featured_categories() {
+		$settings = $this->settings();
+		?>
+		<textarea class="large-text code" rows="6" name="<?php echo esc_attr( self::OPTION_KEY ); ?>[featured_categories]"><?php echo esc_textarea( $settings['featured_categories'] ); ?></textarea>
+		<p class="description"><?php esc_html_e( 'One category name per line. These are boosted in the assistant context.', 'softland-ai' ); ?></p>
+		<?php
+	}
+
+	public function field_important_pages() {
+		$settings = $this->settings();
+		?>
+		<textarea class="large-text code" rows="6" name="<?php echo esc_attr( self::OPTION_KEY ); ?>[important_pages]"><?php echo esc_textarea( $settings['important_pages'] ); ?></textarea>
+		<p class="description"><?php esc_html_e( 'One page slug or title per line, for example shop, جمع جهازك, عناوين الفروع.', 'softland-ai' ); ?></p>
+		<?php
+	}
+
+	public function field_quick_prompts() {
+		$settings = $this->settings();
+		?>
+		<textarea class="large-text code" rows="6" name="<?php echo esc_attr( self::OPTION_KEY ); ?>[quick_prompts]"><?php echo esc_textarea( $settings['quick_prompts'] ); ?></textarea>
+		<p class="description"><?php esc_html_e( 'One starter question per line for the suggestion chips.', 'softland-ai' ); ?></p>
+		<?php
+	}
+
+	public function field_max_products() {
+		$settings = $this->settings();
+		?>
+		<input class="small-text" type="number" min="2" max="12" name="<?php echo esc_attr( self::OPTION_KEY ); ?>[max_products]" value="<?php echo esc_attr( (string) $settings['max_products'] ); ?>">
+		<p class="description"><?php esc_html_e( 'Higher numbers give broader context but may slow responses.', 'softland-ai' ); ?></p>
+		<?php
+	}
+
+	public function field_max_categories() {
+		$settings = $this->settings();
+		?>
+		<input class="small-text" type="number" min="2" max="12" name="<?php echo esc_attr( self::OPTION_KEY ); ?>[max_categories]" value="<?php echo esc_attr( (string) $settings['max_categories'] ); ?>">
+		<p class="description"><?php esc_html_e( 'Keeps the category context compact and relevant.', 'softland-ai' ); ?></p>
+		<?php
+	}
+
 	/**
 	 * Enqueue frontend assets.
 	 */
@@ -235,16 +331,18 @@ final class Softland_AI_Plugin {
 			'softland-ai-frontend',
 			$this->plugin_url( 'assets/css/frontend.css' ),
 			array(),
-			file_exists( $this->plugin_path( 'assets/css/frontend.css' ) ) ? filemtime( $this->plugin_path( 'assets/css/frontend.css' ) ) : '1.0.0'
+			file_exists( $this->plugin_path( 'assets/css/frontend.css' ) ) ? filemtime( $this->plugin_path( 'assets/css/frontend.css' ) ) : '1.1.0'
 		);
 
 		wp_enqueue_script(
 			'softland-ai-frontend',
 			$this->plugin_url( 'assets/js/frontend.js' ),
 			array(),
-			file_exists( $this->plugin_path( 'assets/js/frontend.js' ) ) ? filemtime( $this->plugin_path( 'assets/js/frontend.js' ) ) : '1.0.0',
+			file_exists( $this->plugin_path( 'assets/js/frontend.js' ) ) ? filemtime( $this->plugin_path( 'assets/js/frontend.js' ) ) : '1.1.0',
 			true
 		);
+
+		$rtl = $this->is_rtl_lang();
 
 		wp_localize_script(
 			'softland-ai-frontend',
@@ -257,19 +355,19 @@ final class Softland_AI_Plugin {
 				'pageTitle'          => wp_get_document_title(),
 				'pageUrl'            => home_url( add_query_arg( array(), $GLOBALS['wp']->request ?? '' ) ),
 				'pageType'           => get_post_type() ?: '',
-				'isRtl'              => $this->is_rtl_lang(),
+				'isRtl'              => $rtl,
 				'isAdmin'            => current_user_can( 'manage_options' ),
 				'widgetLabel'        => $settings['widget_label'],
-				'launcherText'       => $settings['launcher_text'] ? $settings['launcher_text'] : ( $this->is_rtl_lang() ? 'استخدم AI' : 'Use AI' ),
-				'thinking'           => $this->is_rtl_lang() ? 'جارٍ تجهيز الرد...' : 'Preparing the answer...',
-				'empty'              => $this->is_rtl_lang() ? 'اكتب سؤالك أولاً.' : 'Write your question first.',
-				'error'              => $this->is_rtl_lang() ? 'تعذر الرد الآن. حاول مرة أخرى.' : 'Unable to answer right now. Please try again.',
-				'userLabel'          => $this->is_rtl_lang() ? 'أنت' : 'You',
+				'launcherText'       => $settings['launcher_text'] ? $settings['launcher_text'] : ( $rtl ? 'اسأل سوفت لاند AI' : 'Ask Softland AI' ),
+				'thinking'           => $rtl ? 'جاري تجهيز أفضل اقتراح لك...' : 'Finding the best match for you...',
+				'empty'              => $rtl ? 'اكتب سؤالك أولًا.' : 'Write your question first.',
+				'error'              => $rtl ? 'تعذر الرد الآن. حاول مرة أخرى بعد قليل.' : 'Unable to answer right now. Please try again in a moment.',
+				'userLabel'          => $rtl ? 'أنت' : 'You',
 				'botLabel'           => $settings['widget_label'],
-				'heading'            => $this->is_rtl_lang() ? 'ابدأ بطرح سؤالك' : 'Start asking questions',
-				'subheading'         => $this->is_rtl_lang() ? 'المساعد يفهم محتوى الموقع ويقترح صفحات وروابط مناسبة.' : 'The assistant understands your site and suggests relevant pages and links.',
-				'placeholder'        => $this->is_rtl_lang() ? 'مثال: أريد شقة للبيع أو أريد صفحة التسعير أو كيف أضيف عقاري؟' : 'Example: I need an apartment for sale, pricing page, or how to add my property?',
-				'disclaimer'         => $this->is_rtl_lang() ? 'قد يخطئ الذكاء الصناعي أحيانًا، راجع التفاصيل النهائية داخل الصفحة المقترحة.' : 'AI may occasionally make mistakes, so verify final details on the suggested page.',
+				'heading'            => $rtl ? 'ابحث عن القطعة أو الصفحة المناسبة' : 'Find the right product or page',
+				'subheading'         => $rtl ? 'اسأل عن التجميعات، قطع الـ PC، الشاشات، التقسيط، الشحن، الضمان، أو صفحات الفروع.' : 'Ask about builds, PC parts, monitors, installments, shipping, warranty, or store pages.',
+				'placeholder'        => $rtl ? 'مثال: أبغى تجميعة ألعاب قوية أو وين صفحة جمع جهازك؟' : 'Example: I need a strong gaming build or where is the build-your-PC page?',
+				'disclaimer'         => $rtl ? 'قد يخطئ الذكاء الاصطناعي أحيانًا، لذلك راجع تفاصيل المنتج أو الصفحة قبل الشراء.' : 'AI may occasionally make mistakes, so verify product or page details before purchase.',
 				'initialSuggestions' => $this->initial_suggestions(),
 			)
 		);
@@ -281,18 +379,29 @@ final class Softland_AI_Plugin {
 	 * @return string[]
 	 */
 	private function initial_suggestions() {
+		$settings = $this->settings();
+		$custom   = $this->multiline_values( $settings['quick_prompts'] );
+
+		if ( ! empty( $custom ) ) {
+			return array_slice( $custom, 0, 5 );
+		}
+
 		if ( $this->is_rtl_lang() ) {
 			return array(
-				'ما أفضل المناطق للاستثمار؟',
-				'أرني أحدث الصفحات أو العقارات',
-				'كيف أضيف عقاري على الموقع؟',
+				'أبغى تجميعة ألعاب قوية',
+				'أبحث عن شاشة مناسبة للقيمنق',
+				'وين صفحة جمع جهازك؟',
+				'كيف أعرف الشحن والضمان؟',
+				'هل عندكم تقسيط؟',
 			);
 		}
 
 		return array(
-			'What are the best areas for investment?',
-			'Show me the newest properties or pages',
-			'How do I add my property to the site?',
+			'I need a strong gaming PC build',
+			'Show me gaming monitors',
+			'Where is the build-your-PC page?',
+			'How do shipping and warranty work?',
+			'Do you offer installments?',
 		);
 	}
 
@@ -319,22 +428,23 @@ final class Softland_AI_Plugin {
 	 * Widget HTML.
 	 */
 	private function widget_markup() {
-		$rtl = $this->is_rtl_lang();
+		$settings = $this->settings();
+		$rtl      = $this->is_rtl_lang();
 
 		ob_start();
 		?>
 		<div class="softland-ai" data-softland-ai dir="<?php echo esc_attr( $rtl ? 'rtl' : 'ltr' ); ?>">
 			<button class="softland-ai__launcher" type="button" data-softland-ai-launcher aria-expanded="false" aria-controls="softland-ai-panel">
 				<span class="softland-ai__spark" aria-hidden="true">✦</span>
-				<span><?php echo esc_html( $this->settings()['launcher_text'] ? $this->settings()['launcher_text'] : ( $rtl ? 'استخدم AI' : 'Use AI' ) ); ?></span>
+				<span><?php echo esc_html( $settings['launcher_text'] ? $settings['launcher_text'] : ( $rtl ? 'اسأل سوفت لاند AI' : 'Ask Softland AI' ) ); ?></span>
 			</button>
 
 			<section class="softland-ai__panel" id="softland-ai-panel" data-softland-ai-panel hidden aria-hidden="true">
 				<div class="softland-ai__card">
 					<div class="softland-ai__head">
 						<div>
-							<strong><?php echo esc_html( $this->settings()['widget_label'] ); ?></strong>
-							<p><?php echo esc_html( $rtl ? 'اسأل عن العقارات، الصفحات، الخدمات، أو أي محتوى داخل الموقع.' : 'Ask about properties, pages, services, or any content inside the site.' ); ?></p>
+							<strong><?php echo esc_html( $settings['widget_label'] ); ?></strong>
+							<p><?php echo esc_html( $rtl ? 'اسأل عن المنتجات، التجميعات، التقسيط، الشحن، الضمان، أو أي صفحة مهمة داخل المتجر.' : 'Ask about products, builds, installments, shipping, warranty, or any important page in the store.' ); ?></p>
 						</div>
 						<button class="softland-ai__close" type="button" data-softland-ai-close aria-label="<?php echo esc_attr( $rtl ? 'إغلاق' : 'Close' ); ?>">×</button>
 					</div>
@@ -342,8 +452,8 @@ final class Softland_AI_Plugin {
 					<div class="softland-ai__body">
 						<div class="softland-ai__intro" data-softland-ai-intro>
 							<span class="softland-ai__hero-icon" aria-hidden="true">✦</span>
-							<h3><?php echo esc_html( $rtl ? 'ابدأ بطرح سؤالك' : 'Start asking questions' ); ?></h3>
-							<p><?php echo esc_html( $rtl ? 'المساعد يفهم الموقع بالكامل ويقترح إجابات وروابط وصفحات مناسبة.' : 'The assistant understands the whole site and suggests answers, links, and relevant pages.' ); ?></p>
+							<h3><?php echo esc_html( $rtl ? 'ابدأ بسؤال سريع' : 'Start with a quick question' ); ?></h3>
+							<p><?php echo esc_html( $rtl ? 'المساعد يفهم صفحات سوفت لاند ويقترح لك أقرب منتج أو فئة أو رابط مفيد.' : 'The assistant understands Softland pages and suggests the closest product, collection, or helpful link.' ); ?></p>
 						</div>
 
 						<div class="softland-ai__chips" data-softland-ai-chips></div>
@@ -353,11 +463,11 @@ final class Softland_AI_Plugin {
 
 					<form class="softland-ai__composer" data-softland-ai-form>
 						<label class="screen-reader-text" for="softland-ai-input"><?php echo esc_html( $rtl ? 'سؤال المساعد' : 'Assistant prompt' ); ?></label>
-						<textarea id="softland-ai-input" name="message" rows="3" data-softland-ai-input placeholder="<?php echo esc_attr( $rtl ? 'مثال: ما أفضل المناطق للاستثمار؟' : 'Example: What are the best areas for investment?' ); ?>"></textarea>
+						<textarea id="softland-ai-input" name="message" rows="3" data-softland-ai-input placeholder="<?php echo esc_attr( $rtl ? 'مثال: أبحث عن كرت شاشة أو أبغى صفحة جمع جهازك' : 'Example: I need a graphics card or the build-your-PC page' ); ?>"></textarea>
 						<button class="softland-ai__submit" type="submit" data-softland-ai-submit aria-label="<?php echo esc_attr( $rtl ? 'إرسال' : 'Send' ); ?>">→</button>
 					</form>
 
-					<p class="softland-ai__disclaimer"><?php echo esc_html( $rtl ? 'قد يخطئ الذكاء الصناعي أحيانًا، لذلك راجع التفاصيل النهائية داخل الصفحة المقترحة.' : 'AI may occasionally make mistakes, so verify final details on the suggested page.' ); ?></p>
+					<p class="softland-ai__disclaimer"><?php echo esc_html( $rtl ? 'قد يخطئ الذكاء الاصطناعي أحيانًا، لذلك راجع تفاصيل المنتج أو الصفحة قبل اعتماد القرار.' : 'AI may occasionally make mistakes, so verify product or page details before making a decision.' ); ?></p>
 				</div>
 			</section>
 		</div>
@@ -375,7 +485,7 @@ final class Softland_AI_Plugin {
 		if ( '' === $message ) {
 			wp_send_json_error(
 				array(
-					'message' => $this->is_rtl_lang() ? 'اكتب سؤالك أولاً.' : 'Write your question first.',
+					'message' => $this->is_rtl_lang() ? 'اكتب سؤالك أولًا.' : 'Write your question first.',
 				),
 				400
 			);
@@ -402,17 +512,33 @@ final class Softland_AI_Plugin {
 	 * @return array<string,mixed>
 	 */
 	private function build_assistant_response( $message, $history, $page_id, $page ) {
+		$settings    = $this->settings();
 		$diagnostics = array(
-			'has_api_key' => '' !== $this->settings()['api_key'],
-			'base_url'    => $this->settings()['base_url'],
-			'model'       => $this->settings()['model'],
+			'has_api_key' => '' !== $settings['api_key'],
+			'base_url'    => $settings['base_url'],
+			'model'       => $settings['model'],
 		);
 
 		$search_link = $this->build_search_link( $message );
 		$context     = $this->collect_site_context( $page_id, $page );
 
-		$system_prompt = 'You are Softland AI, a concise website concierge. Reply in the same language as the user. Use only the given site context. Return only valid JSON with: answer, suggestions, links. Each link item must contain label and url. Keep the answer short and useful.';
-		$user_prompt   = wp_json_encode(
+		$system_prompt = implode(
+			"\n",
+			array(
+				'You are Softland AI, a concise ecommerce shopping assistant for Softland.',
+				'Reply in the same language as the user.',
+				'Use only the provided store context and never invent stock, pricing, shipping, or warranty details.',
+				'Prefer the most relevant product, category, or page link inside the site.',
+				'Keep the answer short, helpful, and action-oriented.',
+				'If the question is outside the available context, be honest and guide the user to the closest page.',
+				'Return only valid JSON with keys: answer, suggestions, links.',
+				'links must be an array of objects with label and url.',
+				'Store profile: ' . $settings['store_profile'],
+				'Reply style: ' . $settings['answer_style'],
+			)
+		);
+
+		$user_prompt = wp_json_encode(
 			array(
 				'question'     => $message,
 				'history'      => $history,
@@ -479,7 +605,7 @@ final class Softland_AI_Plugin {
 
 		$suggestions = array();
 		if ( ! empty( $parsed['suggestions'] ) && is_array( $parsed['suggestions'] ) ) {
-			foreach ( array_slice( $parsed['suggestions'], 0, 3 ) as $suggestion ) {
+			foreach ( array_slice( $parsed['suggestions'], 0, 4 ) as $suggestion ) {
 				$suggestion = sanitize_text_field( (string) $suggestion );
 				if ( '' !== $suggestion ) {
 					$suggestions[] = $suggestion;
@@ -522,10 +648,26 @@ final class Softland_AI_Plugin {
 			);
 		}
 
+		$message_lower = function_exists( 'mb_strtolower' ) ? mb_strtolower( $message ) : strtolower( $message );
+		$mentions_shipping = false !== strpos( $message_lower, 'شحن' ) || false !== strpos( $message_lower, 'shipping' ) || false !== strpos( $message_lower, 'ضمان' ) || false !== strpos( $message_lower, 'warranty' );
+		$mentions_installment = false !== strpos( $message_lower, 'تقسيط' ) || false !== strpos( $message_lower, 'tabby' ) || false !== strpos( $message_lower, 'tamara' ) || false !== strpos( $message_lower, 'installment' );
+
+		$answer = $this->is_rtl_lang()
+			? 'أستطيع مساعدتك في الوصول السريع إلى المنتجات، التصنيفات، وصفحات المتجر المهمة داخل سوفت لاند. اذكر اسم القطعة أو نوع الاستخدام مثل تجميعة ألعاب، كرت شاشة، شاشة، شحن، أو تقسيط وسأوجهك لأقرب نتيجة.'
+			: 'I can help you quickly reach the right products, categories, and important Softland store pages. Mention the item or use case, like gaming build, graphics card, monitor, shipping, or installments, and I will point you to the closest result.';
+
+		if ( $mentions_shipping ) {
+			$answer = $this->is_rtl_lang()
+				? 'لأسئلة الشحن أو الضمان، افتح صفحات الشروط أو الفروع أو ابحث داخل المتجر عن المنتج نفسه لمراجعة التفاصيل النهائية.'
+				: 'For shipping or warranty questions, open the policy or branch pages, or check the product page itself for the final details.';
+		} elseif ( $mentions_installment ) {
+			$answer = $this->is_rtl_lang()
+				? 'إذا كنت تبحث عن التقسيط، ابدأ بصفحات العروض أو المتجر أو المنتجات المناسبة، ثم راجع التفاصيل النهائية داخل صفحة المنتج أو صفحة الشروط.'
+				: 'If you are looking for installments, start with the offers or shop pages, then verify the final terms on the product or policy page.';
+		}
+
 		return array(
-			'answer'      => $this->is_rtl_lang()
-				? 'أستطيع مساعدتك في استكشاف محتوى الموقع والصفحات المهمة. جرّب سؤالًا عن منطقة، صفحة، خدمة، أو نوع عقار وسأوجّهك لأقرب النتائج والروابط المناسبة.'
-				: 'I can help you explore the site and important pages. Ask about an area, page, service, or property type and I will point you to the most relevant results and links.',
+			'answer'      => $answer,
 			'suggestions' => $this->initial_suggestions(),
 			'links'       => $this->unique_links( $links ),
 			'source'      => 'fallback',
@@ -549,8 +691,8 @@ final class Softland_AI_Plugin {
 		$payload = array(
 			'model'       => $model ? $model : 'deepseek-chat',
 			'messages'    => $messages,
-			'temperature' => 0.2,
-			'max_tokens'  => 650,
+			'temperature' => 0.15,
+			'max_tokens'  => 520,
 		);
 
 		$endpoints = array_unique(
@@ -566,7 +708,7 @@ final class Softland_AI_Plugin {
 			$response = wp_remote_post(
 				$endpoint,
 				array(
-					'timeout' => 25,
+					'timeout' => 18,
 					'headers' => array(
 						'Authorization' => 'Bearer ' . $api_key,
 						'Content-Type'  => 'application/json',
@@ -720,7 +862,7 @@ final class Softland_AI_Plugin {
 			);
 		}
 
-		return array_slice( $unique, 0, 4 );
+		return array_slice( $unique, 0, 5 );
 	}
 
 	/**
@@ -734,35 +876,21 @@ final class Softland_AI_Plugin {
 			),
 		);
 
-		if ( get_post_type_archive_link( 'property' ) ) {
+		$shop_url = $this->get_shop_url();
+		if ( $shop_url ) {
 			$links[] = array(
-				'label' => $this->is_rtl_lang() ? 'كل العقارات' : 'All properties',
-				'url'   => get_post_type_archive_link( 'property' ),
+				'label' => $this->is_rtl_lang() ? 'المتجر' : 'Shop',
+				'url'   => $shop_url,
 			);
 		}
 
-		if ( get_post_type_archive_link( 'area' ) ) {
-			$links[] = array(
-				'label' => $this->is_rtl_lang() ? 'المناطق' : 'Areas',
-				'url'   => get_post_type_archive_link( 'area' ),
-			);
+		$links = array_merge( $links, $this->configured_page_links() );
+
+		foreach ( $this->featured_category_links() as $category_link ) {
+			$links[] = $category_link;
 		}
 
-		$pages = get_pages(
-			array(
-				'sort_column' => 'menu_order,post_title',
-				'number'      => 3,
-			)
-		);
-
-		foreach ( $pages as $page ) {
-			$links[] = array(
-				'label' => get_the_title( $page->ID ),
-				'url'   => get_permalink( $page->ID ),
-			);
-		}
-
-		return $links;
+		return $this->unique_links( $links );
 	}
 
 	/**
@@ -770,32 +898,71 @@ final class Softland_AI_Plugin {
 	 */
 	private function collect_site_context( $page_id, $page ) {
 		$context = array(
-			'site' => array(
+			'site'          => array(
 				'name'        => get_bloginfo( 'name' ),
 				'description' => get_bloginfo( 'description' ),
 				'home_url'    => home_url( '/' ),
 				'language'    => determine_locale(),
 			),
-			'current_page' => array_filter(
+			'store_profile' => $this->settings()['store_profile'],
+			'current_page'  => array_filter(
 				array(
 					'title' => $page_id ? get_the_title( $page_id ) : ( $page['title'] ?? '' ),
 					'url'   => $page_id ? get_permalink( $page_id ) : ( $page['url'] ?? '' ),
 					'type'  => $page_id ? get_post_type( $page_id ) : ( $page['type'] ?? '' ),
-					'text'  => $page_id ? wp_trim_words( wp_strip_all_tags( get_post_field( 'post_content', $page_id ) ), 30 ) : '',
+					'text'  => $page_id ? wp_trim_words( wp_strip_all_tags( get_post_field( 'post_content', $page_id ) ), 32 ) : '',
 				)
 			),
 			'important_links' => $this->important_links(),
+			'store'           => $this->get_cached_store_context(),
 			'content'         => array(
-				'pages'      => $this->collect_posts( 'page', 4 ),
-				'posts'      => $this->collect_posts( 'post', 4 ),
-				'properties' => post_type_exists( 'property' ) ? $this->collect_posts( 'property', 5 ) : array(),
-				'areas'      => post_type_exists( 'area' ) ? $this->collect_posts( 'area', 4 ) : array(),
-				'agencies'   => post_type_exists( 'agency' ) ? $this->collect_posts( 'agency', 3 ) : array(),
-				'agents'     => post_type_exists( 'agent' ) ? $this->collect_posts( 'agent', 3 ) : array(),
+				'pages' => $this->collect_posts( 'page', 4 ),
+				'posts' => $this->collect_posts( 'post', 3 ),
 			),
 		);
 
 		return $context;
+	}
+
+	/**
+	 * Get cached store context.
+	 */
+	private function get_cached_store_context() {
+		$cached = get_transient( self::CACHE_KEY );
+		if ( is_array( $cached ) ) {
+			return $cached;
+		}
+
+		$context = $this->build_store_context();
+		set_transient( self::CACHE_KEY, $context, 10 * MINUTE_IN_SECONDS );
+
+		return $context;
+	}
+
+	/**
+	 * Flush cached context.
+	 */
+	public function flush_store_context_cache() {
+		delete_transient( self::CACHE_KEY );
+	}
+
+	/**
+	 * Build store context.
+	 */
+	private function build_store_context() {
+		$settings = $this->settings();
+
+		return array(
+			'platform'            => class_exists( 'WooCommerce' ) ? 'woocommerce' : 'wordpress',
+			'featured_categories' => $this->collect_product_categories(
+				(int) $settings['max_categories'],
+				$this->multiline_values( $settings['featured_categories'] )
+			),
+			'recent_products'     => $this->collect_products( (int) $settings['max_products'] ),
+			'featured_products'   => $this->collect_products( 4, array( 'featured' => true ) ),
+			'core_pages'          => $this->core_store_pages(),
+			'configured_pages'    => $this->configured_page_links(),
+		);
 	}
 
 	/**
@@ -829,16 +996,127 @@ final class Softland_AI_Plugin {
 	}
 
 	/**
+	 * Collect WooCommerce products.
+	 */
+	private function collect_products( $limit, $args = array() ) {
+		if ( ! post_type_exists( 'product' ) ) {
+			return array();
+		}
+
+		$query_args = array(
+			'post_type'              => 'product',
+			'post_status'            => 'publish',
+			'posts_per_page'         => $limit,
+			'no_found_rows'          => true,
+			'ignore_sticky_posts'    => true,
+			'update_post_meta_cache' => false,
+			'update_post_term_cache' => true,
+		);
+
+		if ( ! empty( $args['featured'] ) ) {
+			$query_args['tax_query'] = array(
+				array(
+					'taxonomy' => 'product_visibility',
+					'field'    => 'name',
+					'terms'    => 'featured',
+				),
+			);
+		}
+
+		$query = new WP_Query( $query_args );
+		$items = array();
+
+		foreach ( $query->posts as $post ) {
+			$product_terms = get_the_terms( $post->ID, 'product_cat' );
+			$categories    = array();
+
+			if ( ! is_wp_error( $product_terms ) && is_array( $product_terms ) ) {
+				foreach ( array_slice( $product_terms, 0, 3 ) as $term ) {
+					$categories[] = $term->name;
+				}
+			}
+
+			$items[] = array_filter(
+				array(
+					'title'      => get_the_title( $post->ID ),
+					'url'        => get_permalink( $post->ID ),
+					'type'       => 'product',
+					'excerpt'    => wp_trim_words( wp_strip_all_tags( get_post_field( 'post_content', $post->ID ) ), 22 ),
+					'categories' => $categories,
+				)
+			);
+		}
+
+		wp_reset_postdata();
+		return $items;
+	}
+
+	/**
+	 * Collect product categories.
+	 */
+	private function collect_product_categories( $limit, $preferred_names = array() ) {
+		if ( ! taxonomy_exists( 'product_cat' ) ) {
+			return array();
+		}
+
+		$terms = get_terms(
+			array(
+				'taxonomy'   => 'product_cat',
+				'hide_empty' => true,
+				'number'     => 30,
+				'orderby'    => 'count',
+				'order'      => 'DESC',
+			)
+		);
+
+		if ( is_wp_error( $terms ) || empty( $terms ) ) {
+			return array();
+		}
+
+		$preferred = array();
+		$others    = array();
+
+		foreach ( $terms as $term ) {
+			$item = array(
+				'name'  => $term->name,
+				'url'   => get_term_link( $term ),
+				'slug'  => $term->slug,
+				'count' => (int) $term->count,
+			);
+
+			if ( is_wp_error( $item['url'] ) ) {
+				continue;
+			}
+
+			$matched = false;
+			foreach ( $preferred_names as $preferred_name ) {
+				if ( $this->contains_text( $term->name, $preferred_name ) || $this->contains_text( $term->slug, $preferred_name ) ) {
+					$matched = true;
+					break;
+				}
+			}
+
+			if ( $matched ) {
+				$preferred[] = $item;
+			} else {
+				$others[] = $item;
+			}
+		}
+
+		return array_slice( array_merge( $preferred, $others ), 0, $limit );
+	}
+
+	/**
 	 * Build a focused search link when possible.
 	 */
 	private function build_search_link( $message ) {
 		$message = sanitize_text_field( $message );
-		$property_archive = get_post_type_archive_link( 'property' );
+		$shop_url = $this->get_shop_url();
 
-		if ( $property_archive ) {
+		if ( $shop_url ) {
 			return array(
-				'label' => $this->is_rtl_lang() ? 'نتائج البحث الذكي' : 'Smart search results',
-				'url'   => add_query_arg( 's', rawurlencode( $message ), $property_archive ),
+				'label' => $this->is_rtl_lang() ? 'نتائج البحث في المتجر' : 'Shop search results',
+				'url'   => add_query_arg( 's', rawurlencode( $message ), $shop_url ),
 			);
 		}
 
@@ -846,6 +1124,159 @@ final class Softland_AI_Plugin {
 			'label' => $this->is_rtl_lang() ? 'نتائج البحث' : 'Search results',
 			'url'   => add_query_arg( 's', rawurlencode( $message ), home_url( '/' ) ),
 		);
+	}
+
+	/**
+	 * Get core WooCommerce pages.
+	 */
+	private function core_store_pages() {
+		$pages = array();
+		$labels = array(
+			'shop'      => $this->is_rtl_lang() ? 'المتجر' : 'Shop',
+			'cart'      => $this->is_rtl_lang() ? 'السلة' : 'Cart',
+			'checkout'  => $this->is_rtl_lang() ? 'الدفع' : 'Checkout',
+			'myaccount' => $this->is_rtl_lang() ? 'حسابي' : 'My account',
+		);
+
+		foreach ( $labels as $key => $label ) {
+			$url = '';
+
+			if ( function_exists( 'wc_get_page_permalink' ) ) {
+				$url = wc_get_page_permalink( $key );
+			}
+
+			if ( ! $url && 'shop' === $key ) {
+				$url = $this->get_shop_url();
+			}
+
+			if ( $url ) {
+				$pages[] = array(
+					'label' => $label,
+					'url'   => $url,
+				);
+			}
+		}
+
+		return $pages;
+	}
+
+	/**
+	 * Build page links from configured titles/slugs.
+	 */
+	private function configured_page_links() {
+		$values = $this->multiline_values( $this->settings()['important_pages'] );
+		$links  = array();
+
+		foreach ( $values as $value ) {
+			$page = get_page_by_path( sanitize_title( $value ), OBJECT, 'page' );
+
+			if ( ! $page ) {
+				$page = $this->find_page_by_title_like( $value );
+			}
+
+			if ( ! $page instanceof WP_Post ) {
+				continue;
+			}
+
+			$links[] = array(
+				'label' => get_the_title( $page->ID ),
+				'url'   => get_permalink( $page->ID ),
+			);
+		}
+
+		return $this->unique_links( array_merge( $this->core_store_pages(), $links ) );
+	}
+
+	/**
+	 * Build links for featured categories.
+	 */
+	private function featured_category_links() {
+		$links = array();
+
+		foreach ( $this->collect_product_categories( 4, $this->multiline_values( $this->settings()['featured_categories'] ) ) as $category ) {
+			$links[] = array(
+				'label' => $category['name'],
+				'url'   => $category['url'],
+			);
+		}
+
+		return $links;
+	}
+
+	/**
+	 * Find page by title fragment.
+	 */
+	private function find_page_by_title_like( $title ) {
+		$query = new WP_Query(
+			array(
+				'post_type'              => 'page',
+				'post_status'            => 'publish',
+				'posts_per_page'         => 1,
+				'no_found_rows'          => true,
+				's'                      => $title,
+				'update_post_meta_cache' => false,
+				'update_post_term_cache' => false,
+			)
+		);
+
+		$post = ! empty( $query->posts[0] ) ? $query->posts[0] : null;
+		wp_reset_postdata();
+
+		return $post;
+	}
+
+	/**
+	 * Get shop URL.
+	 */
+	private function get_shop_url() {
+		if ( function_exists( 'wc_get_page_permalink' ) ) {
+			$shop = wc_get_page_permalink( 'shop' );
+			if ( $shop ) {
+				return $shop;
+			}
+		}
+
+		if ( post_type_exists( 'product' ) ) {
+			$archive = get_post_type_archive_link( 'product' );
+			if ( $archive ) {
+				return $archive;
+			}
+		}
+
+		return '';
+	}
+
+	/**
+	 * Convert textarea lines to values.
+	 *
+	 * @param string $text Multiline text.
+	 * @return string[]
+	 */
+	private function multiline_values( $text ) {
+		$lines = preg_split( '/\r\n|\r|\n/', (string) $text );
+		$lines = is_array( $lines ) ? $lines : array();
+		$lines = array_map( 'trim', $lines );
+		$lines = array_filter( $lines );
+
+		return array_values( array_unique( $lines ) );
+	}
+
+	/**
+	 * Safe contains helper.
+	 */
+	private function contains_text( $haystack, $needle ) {
+		$haystack = (string) $haystack;
+		$needle   = trim( (string) $needle );
+
+		if ( '' === $haystack || '' === $needle ) {
+			return false;
+		}
+
+		if ( function_exists( 'mb_stripos' ) ) {
+			return false !== mb_stripos( $haystack, $needle );
+		}
+
+		return false !== stripos( $haystack, $needle );
 	}
 }
 
