@@ -14,7 +14,57 @@ document.addEventListener('DOMContentLoaded', () => {
   const chips = root.querySelector('[data-softland-ai-chips]');
   const messages = root.querySelector('[data-softland-ai-messages]');
   const status = root.querySelector('[data-softland-ai-status]');
+  const storageKey = `softland-ai-chat:${window.location.origin}`;
   let history = [];
+
+  const readStorage = () => {
+    try {
+      const raw = window.localStorage.getItem(storageKey);
+      if (!raw) {
+        return null;
+      }
+
+      const parsed = JSON.parse(raw);
+      return parsed && typeof parsed === 'object' ? parsed : null;
+    } catch (error) {
+      return null;
+    }
+  };
+
+  const writeStorage = (payload) => {
+    try {
+      window.localStorage.setItem(storageKey, JSON.stringify(payload));
+    } catch (error) {
+      // Ignore storage failures so chat still works normally.
+    }
+  };
+
+  const saveConversation = (suggestions = null) => {
+    if (!messages) {
+      return;
+    }
+
+    const renderedMessages = Array.from(messages.querySelectorAll('.softland-ai__message')).map((messageEl) => {
+      const role = messageEl.classList.contains('softland-ai__message--user') ? 'user' : 'assistant';
+      const body = messageEl.querySelector('.softland-ai__message-body')?.textContent || '';
+      const links = Array.from(messageEl.querySelectorAll('.softland-ai__link')).map((linkEl) => ({
+        label: linkEl.textContent || '',
+        url: linkEl.getAttribute('href') || '',
+      }));
+
+      return { role, text: body, links };
+    });
+
+    const savedSuggestions = Array.isArray(suggestions)
+      ? suggestions
+      : Array.from(chips?.querySelectorAll('.softland-ai__chip') || []).map((chip) => chip.textContent || '').filter(Boolean);
+
+    writeStorage({
+      history,
+      messages: renderedMessages,
+      suggestions: savedSuggestions,
+    });
+  };
 
   const renderPromptButtons = (items = []) => {
     if (!chips) {
@@ -33,6 +83,8 @@ document.addEventListener('DOMContentLoaded', () => {
       button.textContent = item;
       chips.appendChild(button);
     });
+
+    saveConversation(items);
   };
 
   const setOpen = (open) => {
@@ -133,6 +185,8 @@ document.addEventListener('DOMContentLoaded', () => {
       renderPromptButtons(payload.suggestions);
     }
 
+    saveConversation(Array.isArray(payload.suggestions) ? payload.suggestions : null);
+
     if (softlandAi.isAdmin && payload?.source === 'fallback' && payload?.diagnostics) {
       const requestError = payload.diagnostics.request_error;
       const parts = [];
@@ -171,6 +225,45 @@ document.addEventListener('DOMContentLoaded', () => {
 
     history.push({ role: 'user', content: text });
     history = history.slice(-6);
+    saveConversation();
+  };
+
+  const restoreConversation = () => {
+    const saved = readStorage();
+    if (!saved || !messages) {
+      return;
+    }
+
+    const savedHistory = Array.isArray(saved.history) ? saved.history : [];
+    history = savedHistory
+      .filter((item) => item && (item.role === 'user' || item.role === 'assistant') && item.content)
+      .slice(-6);
+
+    const savedMessages = Array.isArray(saved.messages) ? saved.messages : [];
+    messages.innerHTML = '';
+
+    savedMessages.forEach((item) => {
+      if (!item?.role || !item?.text) {
+        return;
+      }
+
+      const bubble = createMessage(item.role, item.text);
+      const links = renderLinks(Array.isArray(item.links) ? item.links : []);
+      if (links) {
+        bubble.appendChild(links);
+      }
+      messages.appendChild(bubble);
+    });
+
+    if (savedMessages.length && intro) {
+      intro.hidden = true;
+    }
+
+    if (Array.isArray(saved.suggestions) && saved.suggestions.length) {
+      renderPromptButtons(saved.suggestions);
+    }
+
+    messages.scrollTop = messages.scrollHeight;
   };
 
   const sendMessage = async (text) => {
@@ -273,5 +366,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  renderPromptButtons(Array.isArray(softlandAi.initialSuggestions) ? softlandAi.initialSuggestions : []);
+  restoreConversation();
+
+  if (!history.length) {
+    renderPromptButtons(Array.isArray(softlandAi.initialSuggestions) ? softlandAi.initialSuggestions : []);
+  }
 });
