@@ -451,7 +451,7 @@ final class Softland_AI_Plugin {
 					<form class="softland-ai__composer" data-softland-ai-form>
 						<label class="screen-reader-text" for="softland-ai-input"><?php echo esc_html( 'سؤال المساعد' ); ?></label>
 						<textarea id="softland-ai-input" name="message" rows="3" data-softland-ai-input placeholder="<?php echo esc_attr( 'مثال: أبي كرت شاشة أو أبغى صفحة جمع جهازك' ); ?>"></textarea>
-						<button class="softland-ai__submit" type="submit" data-softland-ai-submit aria-label="<?php echo esc_attr( 'إرسال' ); ?>">→</button>
+						<button style="color: white;background: #f69822;border-radius: 40px;" class="softland-ai__submit" type="submit" data-softland-ai-submit aria-label="<?php echo esc_attr( 'إرسال' ); ?>">→</button>
 					</form>
 
 					<p class="softland-ai__disclaimer"><?php echo esc_html( 'الذكاء الاصطناعي ممكن يغلط أحيان، فراجع تفاصيل المنتج أو الصفحة قبل ما تعتمد قرارك.' ); ?></p>
