@@ -10,6 +10,10 @@
 	--softland-chip-bg: #efefef;
 	--softland-chip-text: #2f3136;
 	--softland-border: rgba(77, 125, 243, 0.14);
+	--softland-launcher-bg: #56146f;
+	--softland-launcher-bg-2: #6c1b84;
+	--softland-launcher-border: #b53aa9;
+	--softland-launcher-icon: #ff4db3;
 	position: fixed;
 	inset-block-end: 18px;
 	z-index: 1200;
@@ -32,15 +36,15 @@
 	align-items: center;
 	gap: 0.55rem;
 	min-height: 46px;
-	padding: 0.72rem 0.95rem;
-	border: 1px solid rgba(255, 101, 24, 0.08);
-	border-radius: 0;
+	padding: 0.85rem 1.45rem;
+	border: 1px solid var(--softland-launcher-border);
+	border-radius: 999px;
 	background:
-		linear-gradient(135deg, rgba(255, 255, 255, 0.04), rgba(255, 101, 24, 0.03)),
-		linear-gradient(135deg, var(--softland-bg), var(--softland-bg-2));
-	box-shadow: 0 10px 22px rgba(0, 0, 0, 0.2);
-	color: #f7f2eb;
-	font-size: 0.9rem;
+		linear-gradient(135deg, rgba(255, 255, 255, 0.02), rgba(255, 77, 179, 0.03)),
+		linear-gradient(135deg, var(--softland-launcher-bg), var(--softland-launcher-bg-2));
+	box-shadow: 0 12px 24px rgba(26, 8, 34, 0.24);
+	color: #fff7fb;
+	font-size: 0.92rem;
 	font-weight: 800;
 	cursor: pointer;
 	transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
@@ -48,13 +52,13 @@
 
 .softland-ai__launcher:hover {
 	transform: translateY(-1px);
-	box-shadow: 0 14px 26px rgba(0, 0, 0, 0.24);
-	border-color: rgba(255, 101, 24, 0.18);
+	box-shadow: 0 16px 28px rgba(26, 8, 34, 0.28);
+	border-color: #cf4cc2;
 }
 
 .softland-ai__spark,
 .softland-ai__hero-icon {
-	color: var(--softland-accent-strong);
+	color: var(--softland-launcher-icon);
 	font-size: 1.2rem;
 	line-height: 1;
 }
@@ -250,22 +254,24 @@
 	inline-size: 100%;
 	min-block-size: 74px;
 	padding: 0.75rem 3.7rem 0.75rem 0.75rem;
-	border: 1px solid rgba(61, 123, 253, 0.18);
+	border: 3px solid #dfe6f8;
 	border-radius: 0;
 	background: rgba(255, 255, 255, 0.96);
-	color: #1e1b16;
+	color: #32455f;
 	font: inherit;
+	font-size: 0.95rem;
 	resize: vertical;
 }
 
 .softland-ai__composer textarea:focus {
 	outline: 0;
-	border-color: var(--softland-accent-strong);
-	box-shadow: 0 0 0 4px rgba(61, 123, 253, 0.1);
+	border-color: #cfdaf5;
+	box-shadow: 0 0 0 2px rgba(207, 218, 245, 0.7);
 }
 
 .softland-ai__composer textarea::placeholder {
-	color: rgba(94, 111, 132, 0.78);
+	color: #8ca0bd;
+	opacity: 1;
 }
 
 .softland-ai__submit {
