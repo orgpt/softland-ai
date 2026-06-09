@@ -338,7 +338,7 @@ final class Softland_AI_Plugin {
 			'softland-ai-frontend',
 			$this->plugin_url( 'assets/js/frontend.js' ),
 			array(),
-			file_exists( $this->plugin_path( 'assets/js/frontend.js' ) ) ? filemtime( $this->plugin_path( 'assets/js/frontend.js' ) ) : '1.1.7',
+			file_exists( $this->plugin_path( 'assets/js/frontend.js' ) ) ? filemtime( $this->plugin_path( 'assets/js/frontend.js' ) ) : '1.1.8',
 			true
 		);
 

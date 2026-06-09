@@ -10,10 +10,10 @@
 	--softland-chip-bg: #faf3ff;
 	--softland-chip-text: #2f215c;
 	--softland-border: rgba(188, 138, 255, 0.28);
-	--softland-launcher-bg: #4e1469;
-	--softland-launcher-bg-2: #651a87;
-	--softland-launcher-border: #b346c7;
-	--softland-launcher-icon: #ff4da1;
+	--softland-launcher-bg: #f3f3f3;
+	--softland-launcher-bg-2: #e9e9e9;
+	--softland-launcher-border: #dadada;
+	--softland-launcher-icon: #ffffff;
 	position: fixed;
 	inset-block-end: 18px;
 	z-index: 1200;
@@ -38,15 +38,18 @@
 	min-height: 42px;
 	padding: 0.72rem 1.2rem;
 	border: 1px solid var(--softland-launcher-border);
-	border-radius: 999px;
+	border-radius: 0;
 	background:
-		linear-gradient(135deg, rgba(255, 255, 255, 0.02), rgba(255, 77, 179, 0.03)), linear-gradient(135deg, #f59923, #e71b2d)
+		linear-gradient(180deg, var(--softland-launcher-bg), var(--softland-launcher-bg-2));
 	box-shadow: 0 12px 24px rgba(26, 8, 34, 0.24);
 	color: #ffffff !important;
 	font-size: 0.86rem;
 	font-weight: 800;
 	cursor: pointer;
 	transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+	position: relative;
+	overflow: hidden;
+	isolation: isolate;
 }
 
 #softland-ai-input {
@@ -61,18 +64,20 @@
 
 .softland-ai__launcher:hover {
 	transform: translateY(-1px);
-	box-shadow: 0 16px 28px rgba(26, 8, 34, 0.28);
-	border-color: #cf4cc2;
+	box-shadow: 0 16px 28px rgba(26, 8, 34, 0.18);
+	border-color: #d0d0d0;
 }
 
 .softland-ai__launcher::after {
 	content: "";
 	position: absolute;
-	inset: -6px;
-	border-radius: inherit;
-	border: 1px solid rgba(255, 77, 161, 0);
-	opacity: 0;
+	inset-block: 0;
+	inset-inline-end: 0;
+	inline-size: 34%;
+	background: linear-gradient(225deg, #ef1d2f 0 48%, transparent 48% 54%, #f6a229 54% 100%);
+	opacity: 1;
 	pointer-events: none;
+	z-index: -1;
 }
 
 .softland-ai__spark,
@@ -355,7 +360,7 @@
 		min-block-size: 58px;
 		padding: 0;
 		justify-content: center;
-		border-radius: 999px;
+		border-radius: 0;
 		max-inline-size: 58px;
 		font-size: 0;
 		box-shadow: 0 10px 22px rgba(26, 8, 34, 0.3);
@@ -375,11 +380,15 @@
 		font-size: 0.98rem;
 		font-weight: 900;
 		letter-spacing: 0.02em;
-		color: #fff7fb;
+		color: #ffffff;
+		position: relative;
+		z-index: 1;
 	}
 
 	.softland-ai__launcher::after {
 		opacity: 1;
+		inline-size: 100%;
+		background: linear-gradient(225deg, #ef1d2f 0 46%, transparent 46% 52%, #f6a229 52% 100%);
 	}
 
 	.softland-ai__panel {
