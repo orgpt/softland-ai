@@ -3,7 +3,7 @@
  * Plugin Name: Softland AI
  * Plugin URI: https://softland.app/
  * Description: Floating AI assistant widget for WordPress with DeepSeek integration, multilingual UI support, contextual answers, and admin API settings.
- * Version: 1.1.6
+ * Version: 1.1.7
  * Author: Softland
  * Author URI: https://softland.app/
  * Text Domain: softland-ai
@@ -331,14 +331,14 @@ final class Softland_AI_Plugin {
 			'softland-ai-frontend',
 			$this->plugin_url( 'assets/css/frontend-v2.css' ),
 			array(),
-			file_exists( $this->plugin_path( 'assets/css/frontend-v2.css' ) ) ? filemtime( $this->plugin_path( 'assets/css/frontend-v2.css' ) ) : '1.1.6'
+			file_exists( $this->plugin_path( 'assets/css/frontend-v2.css' ) ) ? filemtime( $this->plugin_path( 'assets/css/frontend-v2.css' ) ) : '1.1.7'
 		);
 
 		wp_enqueue_script(
 			'softland-ai-frontend',
 			$this->plugin_url( 'assets/js/frontend.js' ),
 			array(),
-			file_exists( $this->plugin_path( 'assets/js/frontend.js' ) ) ? filemtime( $this->plugin_path( 'assets/js/frontend.js' ) ) : '1.1.6',
+			file_exists( $this->plugin_path( 'assets/js/frontend.js' ) ) ? filemtime( $this->plugin_path( 'assets/js/frontend.js' ) ) : '1.1.7',
 			true
 		);
 
@@ -506,8 +506,9 @@ final class Softland_AI_Plugin {
 			'model'       => $settings['model'],
 		);
 
-		$search_link = $this->build_search_link( $message );
-		$context     = $this->collect_site_context( $page_id, $page );
+		$intent_links = $this->intent_links( $message );
+		$context      = $this->collect_site_context( $page_id, $page );
+		$context['intent_matches'] = $intent_links;
 
 		$system_prompt = implode(
 			"\n",
@@ -516,6 +517,9 @@ final class Softland_AI_Plugin {
 				'Always reply in Saudi Arabic dialect, even if the user writes in another language, unless the user explicitly asks you to switch language.',
 				'Use only the provided store context and never invent stock, pricing, shipping, or warranty details.',
 				'Prefer the most relevant product, category, or page link inside the site.',
+				'If the customer asks about a specific part like a graphics card, processor, motherboard, RAM, SSD, power supply, cooling, case, monitor, laptop, keyboard, mouse, or headset, do not redirect them to ready builds unless they explicitly ask for a build.',
+				'If there are direct intent matches in the context, prioritize them first in both the answer and links.',
+				'Never suggest a generic store search button or store search page.',
 				'Keep the answer short, helpful, action-oriented, and natural in Saudi dialect.',
 				'If the question is outside the available context, be honest and guide the user to the closest page in Saudi dialect.',
 				'Return only valid JSON with keys: answer, suggestions, links.',
@@ -529,7 +533,6 @@ final class Softland_AI_Plugin {
 			array(
 				'question'     => $message,
 				'history'      => $history,
-				'search_link'  => $search_link,
 				'site_context' => $context,
 			),
 			JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES
@@ -551,17 +554,17 @@ final class Softland_AI_Plugin {
 		if ( is_wp_error( $content ) ) {
 			$diagnostics['request_error'] = $this->error_details( $content );
 			error_log( 'Softland AI fallback: ' . wp_json_encode( $diagnostics ) );
-			return $this->fallback_response( $message, $search_link, $page, $page_id, $diagnostics );
+			return $this->fallback_response( $message, $intent_links, $page, $page_id, $diagnostics );
 		}
 
 		$parsed = $this->extract_json( $content );
 		if ( ! is_array( $parsed ) || empty( $parsed['answer'] ) ) {
 			$diagnostics['parse_error'] = 'invalid_or_empty_json';
 			error_log( 'Softland AI parse fallback: ' . wp_json_encode( $diagnostics ) );
-			return $this->fallback_response( $message, $search_link, $page, $page_id, $diagnostics );
+			return $this->fallback_response( $message, $intent_links, $page, $page_id, $diagnostics );
 		}
 
-		$links = array();
+		$links = $intent_links;
 		if ( ! empty( $parsed['links'] ) && is_array( $parsed['links'] ) ) {
 			foreach ( $parsed['links'] as $link ) {
 				if ( ! is_array( $link ) ) {
@@ -572,10 +575,6 @@ final class Softland_AI_Plugin {
 					'url'   => esc_url_raw( $link['url'] ?? '' ),
 				);
 			}
-		}
-
-		if ( ! empty( $search_link ) ) {
-			$links[] = $search_link;
 		}
 
 		if ( $page_id && get_permalink( $page_id ) ) {
@@ -616,12 +615,8 @@ final class Softland_AI_Plugin {
 	/**
 	 * Fallback response.
 	 */
-	private function fallback_response( $message, $search_link, $page, $page_id, $diagnostics ) {
-		$links = $this->important_links();
-
-		if ( ! empty( $search_link ) ) {
-			$links[] = $search_link;
-		}
+	private function fallback_response( $message, $intent_links, $page, $page_id, $diagnostics ) {
+		$links = array_merge( $intent_links, $this->important_links() );
 
 		if ( $page_id && get_permalink( $page_id ) ) {
 			$links[] = array(
@@ -638,6 +633,7 @@ final class Softland_AI_Plugin {
 		$message_lower = function_exists( 'mb_strtolower' ) ? mb_strtolower( $message ) : strtolower( $message );
 		$mentions_shipping = false !== strpos( $message_lower, 'شحن' ) || false !== strpos( $message_lower, 'shipping' ) || false !== strpos( $message_lower, 'ضمان' ) || false !== strpos( $message_lower, 'warranty' );
 		$mentions_installment = false !== strpos( $message_lower, 'تقسيط' ) || false !== strpos( $message_lower, 'tabby' ) || false !== strpos( $message_lower, 'tamara' ) || false !== strpos( $message_lower, 'installment' );
+		$mentions_specific_part = ! empty( $intent_links );
 
 		$answer = 'أقدر أساعدك توصل بسرعة للمنتجات، الأقسام، وصفحات المتجر المهمة داخل سوفت لاند. اذكر اسم القطعة أو استخدامك مثل تجميعة ألعاب، كرت شاشة، شاشة، شحن، أو تقسيط وبوجّهك لأقرب نتيجة.';
 
@@ -645,6 +641,9 @@ final class Softland_AI_Plugin {
 			$answer = 'إذا سؤالك عن الشحن أو الضمان، افتح صفحة الشروط أو الفروع أو ادخل على صفحة المنتج نفسه عشان تشوف التفاصيل النهائية.';
 		} elseif ( $mentions_installment ) {
 			$answer = 'إذا تبي تقسيط، ابدأ من صفحات العروض أو المتجر أو المنتجات المناسبة، وبعدها راجع الشروط النهائية داخل صفحة المنتج أو صفحة الشروط.';
+		} elseif ( $mentions_specific_part ) {
+			$first_label = sanitize_text_field( $intent_links[0]['label'] ?? '' );
+			$answer      = $first_label ? 'لقيت لك أقرب قسم/منتج مناسب: ' . $first_label . '. ادخل عليه وشوف الخيارات المتاحة، وإذا تبي أساعدك بترشيح أدق اكتب الموديل أو الميزانية.' : $answer;
 		}
 
 		return array(
@@ -1088,23 +1087,255 @@ final class Softland_AI_Plugin {
 	}
 
 	/**
-	 * Build a focused search link when possible.
+	 * Build links from detected shopping intent.
 	 */
-	private function build_search_link( $message ) {
-		$message = sanitize_text_field( $message );
-		$shop_url = $this->get_shop_url();
+	private function intent_links( $message ) {
+		$matches = array_merge(
+			$this->matched_product_links( $message, 2 ),
+			$this->matched_category_links( $message, 3 )
+		);
 
-		if ( $shop_url ) {
-			return array(
-				'label' => 'نتائج البحث في المتجر',
-				'url'   => add_query_arg( 's', rawurlencode( $message ), $shop_url ),
+		if ( $this->message_wants_build( $message ) ) {
+			$builder_page = $this->find_page_by_title_like( 'جمع جهازك' );
+			if ( $builder_page instanceof WP_Post ) {
+				array_unshift(
+					$matches,
+					array(
+						'label' => get_the_title( $builder_page->ID ),
+						'url'   => get_permalink( $builder_page->ID ),
+					)
+				);
+			}
+		}
+
+		return $this->unique_links( $matches );
+	}
+
+	/**
+	 * Find matching categories based on the user's message.
+	 */
+	private function matched_category_links( $message, $limit = 3 ) {
+		if ( ! taxonomy_exists( 'product_cat' ) ) {
+			return array();
+		}
+
+		$terms = get_terms(
+			array(
+				'taxonomy'   => 'product_cat',
+				'hide_empty' => true,
+				'number'     => 40,
+			)
+		);
+
+		if ( is_wp_error( $terms ) || empty( $terms ) ) {
+			return array();
+		}
+
+		$normalized_message = $this->normalize_text( $message );
+		$matched            = array();
+
+		foreach ( $terms as $term ) {
+			$need_score = $this->message_matches_term( $normalized_message, $term->name, $term->slug );
+			if ( $need_score <= 0 ) {
+				continue;
+			}
+
+			$url = get_term_link( $term );
+			if ( is_wp_error( $url ) ) {
+				continue;
+			}
+
+			$matched[] = array(
+				'score' => $need_score,
+				'link'  => array(
+					'label' => $term->name,
+					'url'   => $url,
+				),
 			);
 		}
 
-		return array(
-			'label' => 'نتائج البحث',
-			'url'   => add_query_arg( 's', rawurlencode( $message ), home_url( '/' ) ),
+		usort(
+			$matched,
+			function ( $a, $b ) {
+				return (int) $b['score'] <=> (int) $a['score'];
+			}
 		);
+
+		return array_map(
+			function ( $item ) {
+				return $item['link'];
+			},
+			array_slice( $matched, 0, $limit )
+		);
+	}
+
+	/**
+	 * Find matching products based on the user's message.
+	 */
+	private function matched_product_links( $message, $limit = 2 ) {
+		if ( ! post_type_exists( 'product' ) ) {
+			return array();
+		}
+
+		$query = new WP_Query(
+			array(
+				'post_type'              => 'product',
+				'post_status'            => 'publish',
+				'posts_per_page'         => 12,
+				'no_found_rows'          => true,
+				's'                      => sanitize_text_field( $message ),
+				'update_post_meta_cache' => false,
+				'update_post_term_cache' => false,
+			)
+		);
+
+		$matches = array();
+		foreach ( $query->posts as $post ) {
+			$score = $this->message_matches_term( $message, get_the_title( $post->ID ), basename( get_permalink( $post->ID ) ) );
+			if ( $score <= 0 ) {
+				continue;
+			}
+
+			$matches[] = array(
+				'score' => $score,
+				'link'  => array(
+					'label' => get_the_title( $post->ID ),
+					'url'   => get_permalink( $post->ID ),
+				),
+			);
+		}
+
+		wp_reset_postdata();
+
+		usort(
+			$matches,
+			function ( $a, $b ) {
+				return (int) $b['score'] <=> (int) $a['score'];
+			}
+		);
+
+		return array_map(
+			function ( $item ) {
+				return $item['link'];
+			},
+			array_slice( $matches, 0, $limit )
+		);
+	}
+
+	/**
+	 * Check if the message wants a build rather than a single part.
+	 */
+	private function message_wants_build( $message ) {
+		$normalized = $this->normalize_text( $message );
+		$keywords   = array( 'تجميعة', 'تجميعه', 'تجميعات', 'جمع جهاز', 'pc builder', 'build pc', 'gaming pc', 'setup' );
+
+		foreach ( $keywords as $keyword ) {
+			if ( false !== strpos( $normalized, $this->normalize_text( $keyword ) ) ) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Score whether a term matches the message.
+	 */
+	private function message_matches_term( $message, $name, $slug ) {
+		$normalized_message = $this->normalize_text( $message );
+		$normalized_name    = $this->normalize_text( $name );
+		$normalized_slug    = $this->normalize_text( $slug );
+
+		$score = 0;
+
+		if ( '' !== $normalized_name && false !== strpos( $normalized_message, $normalized_name ) ) {
+			$score += 10;
+		}
+
+		if ( '' !== $normalized_slug && false !== strpos( $normalized_message, $normalized_slug ) ) {
+			$score += 7;
+		}
+
+		foreach ( $this->intent_keyword_map() as $intent ) {
+			$matched_keyword = false;
+			foreach ( $intent['keywords'] as $keyword ) {
+				if ( false !== strpos( $normalized_message, $this->normalize_text( $keyword ) ) ) {
+					$matched_keyword = true;
+					break;
+				}
+			}
+
+			if ( ! $matched_keyword ) {
+				continue;
+			}
+
+			foreach ( $intent['category_hints'] as $hint ) {
+				$normalized_hint = $this->normalize_text( $hint );
+				if ( false !== strpos( $normalized_name, $normalized_hint ) || false !== strpos( $normalized_slug, $normalized_hint ) ) {
+					$score += 12;
+				}
+			}
+		}
+
+		if ( $this->message_wants_build( $message ) ) {
+			if ( false !== strpos( $normalized_name, $this->normalize_text( 'تجميع' ) ) || false !== strpos( $normalized_slug, 'build' ) ) {
+				$score += 14;
+			}
+		} else {
+			if ( false !== strpos( $normalized_name, $this->normalize_text( 'تجميع' ) ) || false !== strpos( $normalized_slug, 'build' ) ) {
+				$score -= 8;
+			}
+		}
+
+		return $score;
+	}
+
+	/**
+	 * Map user intents to category hints.
+	 */
+	private function intent_keyword_map() {
+		return array(
+			array(
+				'keywords'       => array( 'كرت شاشة', 'كرت شاشه', 'كروت شاشة', 'gpu', 'graphics card', 'rtx', 'gtx', 'rx 9070', 'rx', 'nvidia', 'amd' ),
+				'category_hints' => array( 'كرت', 'gpu', 'vga', 'graphics', 'rtx', 'gtx', 'rx' ),
+			),
+			array(
+				'keywords'       => array( 'رام', 'رامات', 'memory', 'ddr4', 'ddr5' ),
+				'category_hints' => array( 'ram', 'memory', 'ddr' ),
+			),
+			array(
+				'keywords'       => array( 'معالج', 'cpu', 'processor', 'ryzen', 'intel core', 'i5', 'i7', 'i9' ),
+				'category_hints' => array( 'cpu', 'processor', 'معالج', 'ryzen', 'intel' ),
+			),
+			array(
+				'keywords'       => array( 'ماذربورد', 'لوحة أم', 'لوحة ام', 'motherboard', 'board', 'b650', 'z790' ),
+				'category_hints' => array( 'motherboard', 'board', 'لوحة' ),
+			),
+			array(
+				'keywords'       => array( 'ssd', 'nvme', 'هارد', 'تخزين', 'storage' ),
+				'category_hints' => array( 'ssd', 'nvme', 'storage', 'hard' ),
+			),
+			array(
+				'keywords'       => array( 'شاشة', 'monitor', '144hz', '240hz' ),
+				'category_hints' => array( 'شاش', 'monitor' ),
+			),
+			array(
+				'keywords'       => array( 'كيبورد', 'keyboard', 'ماوس', 'mouse', 'سماعة', 'headset' ),
+				'category_hints' => array( 'keyboard', 'mouse', 'headset', 'accessor', 'ملحق' ),
+			),
+		);
+	}
+
+	/**
+	 * Normalize text for matching.
+	 */
+	private function normalize_text( $text ) {
+		$text = (string) $text;
+		$text = function_exists( 'mb_strtolower' ) ? mb_strtolower( $text ) : strtolower( $text );
+		$text = str_replace( array( 'أ', 'إ', 'آ', 'ى', 'ة', '-', '_', '/' ), array( 'ا', 'ا', 'ا', 'ي', 'ه', ' ', ' ', ' ' ), $text );
+		$text = preg_replace( '/\s+/u', ' ', $text );
+
+		return trim( (string) $text );
 	}
 
 	/**
