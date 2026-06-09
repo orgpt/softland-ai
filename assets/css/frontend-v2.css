@@ -13,6 +13,8 @@
 	--softland-launcher-bg: #f3f3f3;
 	--softland-launcher-bg-2: #e9e9e9;
 	--softland-launcher-border: #dadada;
+	--softland-launcher-accent-red: #ef1d2f;
+	--softland-launcher-accent-orange: #f6a229;
 	--softland-launcher-icon: #ffffff;
 	position: fixed;
 	inset-block-end: 18px;
@@ -73,8 +75,8 @@
 	position: absolute;
 	inset-block: 0;
 	inset-inline-end: 0;
-	inline-size: 34%;
-	background: linear-gradient(225deg, #ef1d2f 0 48%, transparent 48% 54%, #f6a229 54% 100%);
+	inline-size: 28%;
+	background: linear-gradient(180deg, var(--softland-launcher-accent-red), var(--softland-launcher-accent-orange));
 	opacity: 1;
 	pointer-events: none;
 	z-index: -1;
@@ -388,7 +390,7 @@
 	.softland-ai__launcher::after {
 		opacity: 1;
 		inline-size: 100%;
-		background: linear-gradient(225deg, #ef1d2f 0 46%, transparent 46% 52%, #f6a229 52% 100%);
+		background: linear-gradient(180deg, var(--softland-launcher-accent-red), var(--softland-launcher-accent-orange));
 	}
 
 	.softland-ai__panel {
