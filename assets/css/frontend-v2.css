@@ -334,18 +334,66 @@
 		inset-inline: 10px;
 		inset-block-end: 72px;
 		inline-size: auto;
+		max-block-size: calc(100dvh - 84px);
 	}
 
 	.softland-ai__card {
-		padding: 0.85rem;
+		gap: 0.45rem;
+		padding: 0.72rem;
 		border-radius: 0 0 22px 22px;
+		max-block-size: calc(100dvh - 84px);
+		overflow: auto;
 	}
 
 	.softland-ai__intro h3 {
-		font-size: 1.45rem;
+		font-size: 1.15rem;
+	}
+
+	.softland-ai__head strong {
+		font-size: 0.88rem;
+	}
+
+	.softland-ai__head p,
+	.softland-ai__intro p,
+	.softland-ai__disclaimer {
+		font-size: 0.75rem;
+		line-height: 1.4;
+	}
+
+	.softland-ai__body {
+		gap: 0.45rem;
+	}
+
+	.softland-ai__intro {
+		gap: 0.2rem;
+		padding: 0;
+	}
+
+	.softland-ai__chips {
+		gap: 0.35rem;
+	}
+
+	.softland-ai__chip {
+		min-height: 32px;
+		padding: 0.42rem 0.72rem;
+		font-size: 0.78rem;
+	}
+
+	.softland-ai__messages {
+		max-block-size: 110px;
 	}
 
 	.softland-ai__composer textarea {
-		min-block-size: 58px;
+		min-block-size: 48px;
+		padding: 0.55rem 3.2rem 0.55rem 0.62rem;
+		font-size: 0.82rem;
+	}
+
+	.softland-ai__submit {
+		inline-size: 30px;
+		block-size: 30px;
+		inset-inline-end: 10px;
+		inset-block-end: 10px;
+		font-size: 0.9rem;
 	}
 }
