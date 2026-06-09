@@ -432,7 +432,7 @@ final class Softland_AI_Plugin {
 					<div class="softland-ai__head">
 						<div>
 							<strong><?php echo esc_html( $settings['widget_label'] ); ?></strong>
-							<p><?php echo esc_html( 'اسأل عن المنتجات، التجميعات، التقسيط، الشحن، الضمان، أو أي صفحة مهمة داخل المتجر.' ); ?></p>
+							<p><?php echo esc_html( 'اسأل عن المنتجات، التجميعات، التقسيط أو أي صفحة مهمة داخل المتجر.' ); ?></p>
 						</div>
 						<button class="softland-ai__close" type="button" data-softland-ai-close aria-label="<?php echo esc_attr( 'إغلاق' ); ?>">×</button>
 					</div>
