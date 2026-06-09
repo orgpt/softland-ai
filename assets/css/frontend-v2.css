@@ -341,8 +341,8 @@
 
 	[dir="rtl"].softland-ai,
 	[dir="ltr"].softland-ai {
-		left: 10px;
-		right: auto;
+	right: auto !important;
+    left: 10px !important; 
 		inset-inline: auto;
 		inset-inline-start: auto;
 		inset-inline-end: auto;
