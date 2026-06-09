@@ -1,19 +1,19 @@
 .softland-ai {
-	--softland-bg: #151012;
-	--softland-bg-2: #23191d;
-	--softland-card: #f8f8f8;
-	--softland-card-2: #f2f2f2;
-	--softland-text: #221f22;
-	--softland-text-soft: #5f6774;
-	--softland-accent: #ff6518;
-	--softland-accent-strong: #4d7df3;
-	--softland-chip-bg: #efefef;
-	--softland-chip-text: #2f3136;
-	--softland-border: rgba(77, 125, 243, 0.14);
-	--softland-launcher-bg: #56146f;
-	--softland-launcher-bg-2: #6c1b84;
-	--softland-launcher-border: #b53aa9;
-	--softland-launcher-icon: #ff4db3;
+	--softland-bg: #20112d;
+	--softland-bg-2: #3e165b;
+	--softland-card: #fffafd;
+	--softland-card-2: #fff8fc;
+	--softland-text: #2e1b58;
+	--softland-text-soft: #735f97;
+	--softland-accent: #b16cff;
+	--softland-accent-strong: #ff4da1;
+	--softland-chip-bg: #faf3ff;
+	--softland-chip-text: #2f215c;
+	--softland-border: rgba(188, 138, 255, 0.28);
+	--softland-launcher-bg: #4e1469;
+	--softland-launcher-bg-2: #651a87;
+	--softland-launcher-border: #b346c7;
+	--softland-launcher-icon: #ff4da1;
 	position: fixed;
 	inset-block-end: 18px;
 	z-index: 1200;
@@ -35,8 +35,8 @@
 	display: inline-flex;
 	align-items: center;
 	gap: 0.55rem;
-	min-height: 46px;
-	padding: 0.85rem 1.45rem;
+	min-height: 42px;
+	padding: 0.72rem 1.2rem;
 	border: 1px solid var(--softland-launcher-border);
 	border-radius: 999px;
 	background:
@@ -44,7 +44,7 @@
 		linear-gradient(135deg, var(--softland-launcher-bg), var(--softland-launcher-bg-2));
 	box-shadow: 0 12px 24px rgba(26, 8, 34, 0.24);
 	color: #fff7fb;
-	font-size: 0.92rem;
+	font-size: 0.86rem;
 	font-weight: 800;
 	cursor: pointer;
 	transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
@@ -59,14 +59,14 @@
 .softland-ai__spark,
 .softland-ai__hero-icon {
 	color: var(--softland-launcher-icon);
-	font-size: 1.2rem;
+	font-size: 1.05rem;
 	line-height: 1;
 }
 
 .softland-ai__panel {
 	position: absolute;
 	inset-block-end: calc(100% + 12px);
-	inline-size: min(350px, calc(100vw - 24px));
+	inline-size: min(330px, calc(100vw - 20px));
 }
 
 [dir="rtl"] .softland-ai__panel {
@@ -80,14 +80,14 @@
 .softland-ai__card {
 	display: grid;
 	gap: 0.65rem;
-	padding: 0.82rem;
-	border: 1px solid rgba(61, 123, 253, 0.12);
-	border-radius: 0 0 26px 26px;
+	padding: 0.95rem;
+	border: 1px solid rgba(204, 177, 237, 0.55);
+	border-radius: 0 0 24px 24px;
 	background:
-		radial-gradient(circle at top right, rgba(61, 123, 253, 0.08), transparent 28%),
-		radial-gradient(circle at top left, rgba(255, 101, 24, 0.06), transparent 35%),
+		radial-gradient(circle at top right, rgba(255, 77, 161, 0.08), transparent 28%),
+		radial-gradient(circle at top left, rgba(177, 108, 255, 0.08), transparent 35%),
 		linear-gradient(180deg, var(--softland-card) 0%, var(--softland-card-2) 100%);
-	box-shadow: 0 18px 42px rgba(0, 0, 0, 0.18);
+	box-shadow: 0 18px 42px rgba(72, 35, 114, 0.14);
 }
 
 .softland-ai__head {
@@ -99,7 +99,7 @@
 
 .softland-ai__head strong {
 	display: block;
-	font-size: 1rem;
+	font-size: 0.98rem;
 	color: var(--softland-text);
 }
 
@@ -109,7 +109,7 @@
 	margin: 0.2rem 0 0;
 	color: var(--softland-text-soft);
 	line-height: 1.5;
-	font-size: 0.84rem;
+	font-size: 0.82rem;
 }
 
 .softland-ai__close {
@@ -120,8 +120,8 @@
 	block-size: 36px;
 	border: 0;
 	border-radius: 50%;
-	background: rgba(16, 18, 21, 0.06);
-	color: #51606f;
+	background: rgba(177, 108, 255, 0.08);
+	color: #7b5aa8;
 	font-size: 1.55rem;
 	cursor: pointer;
 }
@@ -136,12 +136,13 @@
 	justify-items: center;
 	text-align: center;
 	gap: 0.35rem;
-	padding: 0.05rem 0 0.1rem;
+	padding: 0.05rem 0 0.2rem;
 }
 
 .softland-ai__intro h3 {
 	margin: 0;
-	font-size: 1.08rem;
+	font-size: 1.75rem;
+	font-weight: 900;
 	line-height: 1.1;
 	color: var(--softland-text);
 }
@@ -156,13 +157,13 @@
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
-	min-height: 34px;
-	padding: 0.48rem 0.72rem;
-	border: 1px solid rgba(0, 0, 0, 0.04);
-	border-radius: 0;
+	min-height: 38px;
+	padding: 0.55rem 0.95rem;
+	border: 1px solid rgba(204, 177, 237, 0.9);
+	border-radius: 999px;
 	background: var(--softland-chip-bg);
 	color: var(--softland-chip-text);
-	font-size: 0.86rem;
+	font-size: 0.85rem;
 	font-weight: 700;
 	cursor: pointer;
 	transition: transform 180ms ease, background 180ms ease, border-color 180ms ease;
@@ -170,14 +171,14 @@
 
 .softland-ai__chip:hover {
 	transform: translateY(-1px);
-	background: #e7e7e7;
-	border-color: rgba(255, 101, 24, 0.14);
+	background: #f7ebff;
+	border-color: rgba(177, 108, 255, 0.8);
 }
 
 .softland-ai__messages {
 	display: grid;
 	gap: 0.55rem;
-	max-block-size: 180px;
+	max-block-size: 165px;
 	overflow: auto;
 	padding-inline-end: 0.25rem;
 }
@@ -190,20 +191,20 @@
 .softland-ai__message-label {
 	font-size: 0.68rem;
 	font-weight: 800;
-	color: #7a7f89;
+	color: #8f79b5;
 }
 
 .softland-ai__message-body {
 	padding: 0.72rem 0.82rem;
-	border-radius: 12px;
+	border-radius: 16px;
 	line-height: 1.55;
 	font-size: 0.88rem;
 }
 
 .softland-ai__message--assistant .softland-ai__message-body {
-	background: #efefef;
-	color: #25282d;
-	border: 1px solid rgba(0, 0, 0, 0.03);
+	background: #f9f2ff;
+	color: #2b2050;
+	border: 1px solid rgba(204, 177, 237, 0.55);
 }
 
 .softland-ai__message--user {
@@ -211,8 +212,8 @@
 }
 
 .softland-ai__message--user .softland-ai__message-body {
-	background: linear-gradient(135deg, #3f3a3d, #474144);
-	color: #fffaf4;
+	background: linear-gradient(135deg, #3b1457, #5d1d82);
+	color: #fff9ff;
 }
 
 .softland-ai__links {
@@ -228,9 +229,9 @@
 	min-height: 32px;
 	padding: 0.42rem 0.65rem;
 	border-radius: 999px;
-	background: #3f3a3d;
-	border: 1px solid rgba(255, 255, 255, 0.06);
-	color: #fff7ef;
+	background: #f2e8ff;
+	border: 1px solid rgba(204, 177, 237, 0.75);
+	color: #4b2f7b;
 	font-size: 0.8rem;
 	font-weight: 700;
 	text-decoration: none;
@@ -238,7 +239,7 @@
 
 .softland-ai__status {
 	min-height: 0.95rem;
-	color: #5f6e87;
+	color: #7f69a6;
 	font-size: 0.78rem;
 }
 
@@ -252,42 +253,43 @@
 
 .softland-ai__composer textarea {
 	inline-size: 100%;
-	min-block-size: 74px;
-	padding: 0.75rem 3.7rem 0.75rem 0.75rem;
-	border: 3px solid #dfe6f8;
-	border-radius: 0;
+	min-block-size: 82px;
+	padding: 0.8rem 4rem 0.8rem 0.8rem;
+	border: 3px solid #c88cff;
+	border-radius: 22px;
 	background: rgba(255, 255, 255, 0.96);
-	color: #32455f;
+	color: #6e5e98;
 	font: inherit;
-	font-size: 0.95rem;
+	font-size: 0.92rem;
 	resize: vertical;
+	box-shadow: 0 0 0 6px rgba(200, 140, 255, 0.12);
 }
 
 .softland-ai__composer textarea:focus {
 	outline: 0;
-	border-color: #cfdaf5;
-	box-shadow: 0 0 0 2px rgba(207, 218, 245, 0.7);
+	border-color: #b16cff;
+	box-shadow: 0 0 0 6px rgba(177, 108, 255, 0.16);
 }
 
 .softland-ai__composer textarea::placeholder {
-	color: #8ca0bd;
+	color: #8d79b7;
 	opacity: 1;
 }
 
 .softland-ai__submit {
 	position: absolute;
-	inset-inline-end: 10px;
-	inset-block-end: 10px;
+	inset-inline-end: 12px;
+	inset-block-end: 12px;
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
-	inline-size: 38px;
-	block-size: 38px;
+	inline-size: 34px;
+	block-size: 34px;
 	border: 0;
-	border-radius: 0;
-	background: linear-gradient(135deg, #ff7a1f, #ff5f14);
-	color: #1b120d;
-	font-size: 1.05rem;
+	border-radius: 50%;
+	background: #e3d5f0;
+	color: #7e5da7;
+	font-size: 1rem;
 	font-weight: 800;
 	cursor: pointer;
 	transition: transform 180ms ease, filter 180ms ease;
@@ -295,7 +297,7 @@
 
 .softland-ai__submit:hover:not(:disabled) {
 	transform: translateY(-1px);
-	filter: brightness(1.02);
+	filter: brightness(0.98);
 }
 
 .softland-ai__submit:disabled,
@@ -318,7 +320,7 @@
 	.softland-ai__launcher {
 		inline-size: auto;
 		justify-content: center;
-		max-inline-size: 230px;
+		max-inline-size: 210px;
 	}
 
 	.softland-ai__panel {
@@ -329,15 +331,15 @@
 	}
 
 	.softland-ai__card {
-		padding: 0.78rem;
+		padding: 0.85rem;
 		border-radius: 0 0 22px 22px;
 	}
 
 	.softland-ai__intro h3 {
-		font-size: 1rem;
+		font-size: 1.45rem;
 	}
 
 	.softland-ai__composer textarea {
-		min-block-size: 68px;
+		min-block-size: 74px;
 	}
 }
